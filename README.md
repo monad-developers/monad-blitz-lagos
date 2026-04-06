@@ -10,6 +10,6 @@
 
 ![2.png](https://github.com/monad-developers/monad-blitz-denver/blob/main/screenshots/2.png?raw=true)
 
-1. In your fork you can make all the changes you want, add code of your project, create branches, add information to `README.md` , you can change anything and everything.
+3. In your fork you can make all the changes you want, add code of your project, create branches, add information to `README.md` , you can change anything and everything.
 
-2. For next steps head to [Blitz Portal](https://blitz.devnads.com)
+4. For next steps head to [Blitz Portal](https://blitz.devnads.com)
