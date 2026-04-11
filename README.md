@@ -7,7 +7,7 @@ The user connects a wallet, writes a natural-language payment rule, previews the
 ## Stack
 
 - Frontend: React, Vite, TypeScript, wagmi, viem
-- Backend: Node.js, TypeScript, Hono, Zod, SQLite, Drizzle
+- Backend: Node.js, TypeScript, Hono, Zod, PostgreSQL, Drizzle
 - Contracts: Solidity, Hardhat
 - Shared: reusable types, Zod schemas, constants
 
@@ -48,19 +48,25 @@ cp .env.example .env
 npm run install:all
 ```
 
-3. Start the backend.
+3. Start the local Postgres database.
+
+```bash
+npm run db:up
+```
+
+4. Start the backend.
 
 ```bash
 npm run dev:backend
 ```
 
-4. In another terminal, start the frontend.
+5. In another terminal, start the frontend.
 
 ```bash
 npm run dev:frontend
 ```
 
-5. Run the contract tests when you want to validate the on-chain demo layer.
+6. Run the contract tests when you want to validate the on-chain demo layer.
 
 ```bash
 npm run test:contracts
@@ -73,6 +79,10 @@ npm run test:contracts
 - `npm run install:frontend`
 - `npm run install:contracts`
 - `npm run install:all`
+- `npm run db:up`
+- `npm run db:down`
+- `npm run db:logs`
+- `npm run db:push`
 - `npm run dev:backend`
 - `npm run dev:frontend`
 - `npm run build`
@@ -129,6 +139,7 @@ npm run demo
 ## Notes
 
 - This MVP skips authentication to reduce setup time.
-- SQLite is stored under `backend/data/`.
+- The local Postgres database runs through Docker Compose on `localhost:5432`.
+- The backend creates its tables automatically on startup and can also be synced with `npm run db:push`.
 - Rules are stored off-chain and only transaction execution touches the chain.
 - For USDC rules, set `MONAD_USDC_TOKEN_ADDRESS` once you know the Monad testnet token address you want to demo with.
