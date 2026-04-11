@@ -54,7 +54,7 @@ export async function POST(req: Request) {
           maxPrice: z.number().optional().describe('Maximum price filter'),
           category: z.string().optional().describe('One of: electronics, footwear, bags, accessories, gaming')
         }),
-        execute: async ({ query, maxPrice, category }) => {
+        execute: async ({ query, maxPrice, category }: { query: string, maxPrice?: number, category?: string }) => {
           const lowerQuery = query.toLowerCase()
           const filtered = products.filter((p) => {
             const matchesText = p.name.toLowerCase().includes(lowerQuery) || 
@@ -66,14 +66,14 @@ export async function POST(req: Request) {
           })
           return filtered.slice(0, 6)
         }
-      }),
+      } as any),
       addToCart: tool({
         description: 'Add a product to the user\'s cart.',
         parameters: z.object({
           productId: z.string().describe('The unique ID of the product'),
           quantity: z.number().default(1).describe('The quantity to add')
         }),
-        execute: async ({ productId, quantity }) => {
+        execute: async ({ productId, quantity }: { productId: string, quantity: number }) => {
           const product = products.find(p => p.id === productId)
           if (!product) {
             return { success: false, message: 'Product not found' }
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
             message: `${quantity || 1} x ${product.name} added to cart`
           }
         }
-      })
+      } as any)
     }
   })
 
