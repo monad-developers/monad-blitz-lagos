@@ -8,9 +8,10 @@ import type {
   RunRuleRequest,
   RunRuleResponse,
   SaveRuleResponse,
-} from "@paypilot/shared";
+} from "../shared";
+import { clientEnv } from "../config/env";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8787";
+const API_BASE_URL = clientEnv.apiUrl;
 
 async function request<T>(path: string, init?: RequestInit) {
   const response = await fetch(`${API_BASE_URL}${path}`, {

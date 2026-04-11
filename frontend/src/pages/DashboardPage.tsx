@@ -1,4 +1,4 @@
-import type { PaymentRule, ParsedRuleDraft } from "@paypilot/shared";
+import type { PaymentRule, ParsedRuleDraft } from "../shared";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { isAddress } from "viem";

@@ -1,4 +1,4 @@
-import type { PaymentRule } from "@paypilot/shared";
+import type { PaymentRule } from "../../shared";
 import type { RuleRunState } from "../../types/ui";
 
 type RuleListProps = {

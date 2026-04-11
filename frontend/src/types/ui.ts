@@ -1,4 +1,4 @@
-import type { RunRuleResponse } from "@paypilot/shared";
+import type { RunRuleResponse } from "../shared";
 
 export type RuleRunState = {
   status: "idle" | "running" | "simulated" | "success" | "error";

@@ -1,4 +1,4 @@
-import type { ParsedRuleDraft } from "@paypilot/shared";
+import type { ParsedRuleDraft } from "../../shared";
 
 type RulePreviewCardProps = {
   rule: ParsedRuleDraft;
