@@ -133,8 +133,8 @@ function extractAmountAndToken(prompt: string) {
     };
   }
 
-  // Try: "10 USDC" anywhere in the prompt (for more flexible parsing)
-  const amountTokenMatch = prompt.match(/(\d+(?:\.\d+)?)\s+([A-Z]{2,10})/);
+  // Try: "10 USDC" anywhere in the prompt (case-insensitive)
+  const amountTokenMatch = prompt.match(/(\d+(?:\.\d+)?)\s+([a-zA-Z]{2,10})/i);
 
   if (amountTokenMatch) {
     return {

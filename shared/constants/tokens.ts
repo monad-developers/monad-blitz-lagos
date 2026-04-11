@@ -1,5 +1,7 @@
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
+const MONAD_USDC_ADDRESS = "0x60C05d4Df4cC6CBA82C1F120188d7b2760AaBBD6";
+
 export const SUPPORTED_TOKENS = {
   MON: {
     symbol: "MON",
@@ -9,7 +11,7 @@ export const SUPPORTED_TOKENS = {
   },
   USDC: {
     symbol: "USDC",
-    address: "",
+    address: MONAD_USDC_ADDRESS,
     decimals: 6,
     isNative: false,
   },

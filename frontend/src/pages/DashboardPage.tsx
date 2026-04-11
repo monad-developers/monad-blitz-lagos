@@ -143,11 +143,74 @@ export function DashboardPage() {
         },
       }));
 
-      const txHash = await walletClient.sendTransaction({
-        to: prepared.transaction.to as `0x${string}`,
-        value: prepared.transaction.value ? BigInt(prepared.transaction.value) : 0n,
-        data: prepared.transaction.data as `0x${string}` | undefined,
+      console.log("Transaction hash received before:", {
+        to: prepared.transaction.to,
+        value: prepared.transaction.value,
+        data: prepared.transaction.data,
+        prepared
       });
+
+      let txHash: string;
+
+      if(prepared.transaction.value === "0") {
+        // USDC/ERC20: Need to approve first
+        console.log("USDC transfer detected - requesting approval");
+        
+        setRunStates((current) => ({
+          ...current,
+          [rule.id]: {
+            status: "running",
+            message: `Requesting approval to transfer ${prepared.rule.amount} USDC...`,
+          },
+        }));
+
+        // Approve AutoPayAgent to spend USDC
+        const approvalTxHash = await walletClient.writeContract({
+          address: (prepared.rule.tokenAddress || "0x60C05d4Df4cC6CBA82C1F120188d7b2760AaBBD6") as `0x${string}`,
+          abi: [
+            {
+              name: "approve",
+              type: "function",
+              stateMutability: "nonpayable",
+              inputs: [
+                { name: "spender", type: "address" },
+                { name: "amount", type: "uint256" },
+              ],
+              outputs: [{ name: "", type: "bool" }],
+            },
+          ],
+          functionName: "approve",
+          args: [
+            prepared.transaction.to, // AutoPayAgent
+            BigInt(prepared.rule.amount) * BigInt(10) ** BigInt(6), // amount with 6 decimals for USDC
+          ],
+        } as any);
+
+        console.log("Approval tx:", approvalTxHash);
+
+        setRunStates((current) => ({
+          ...current,
+          [rule.id]: {
+            status: "running",
+            message: `Approval confirmed. Executing transfer of ${prepared.rule.amount} USDC...`,
+          },
+        }));
+
+        // Execute the transfer
+        txHash = await walletClient.sendTransaction({
+          to: prepared.transaction.to as `0x${string}`,
+          value: 0n,
+          data: prepared.transaction.data as `0x${string}` | undefined,
+        });
+      } else {
+        // MON: value contains the amount in wei
+        console.log("Sending MON transaction with value:", prepared.transaction.value);
+        txHash = await walletClient.sendTransaction({
+          to: prepared.transaction.to as `0x${string}`,
+          value: BigInt(prepared.transaction.value),
+          data: prepared.transaction.data as `0x${string}` | undefined,
+        });
+      }
 
       console.log("Transaction submitted:", txHash);
 
