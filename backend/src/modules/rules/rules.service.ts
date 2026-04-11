@@ -66,42 +66,44 @@ function serializeRule(rule: PaymentRule) {
   };
 }
 
-export function listRules() {
-  const rows = db
-    .select()
-    .from(rulesTable)
-    .orderBy(desc(rulesTable.createdAt))
-    .all();
+export async function listRules() {
+  const rows = await db.select().from(rulesTable).orderBy(desc(rulesTable.createdAt));
 
   return rows.map(mapRuleRow);
 }
 
-export function getRuleById(id: string) {
-  const row = db.select().from(rulesTable).where(eq(rulesTable.id, id)).get();
+export async function getRuleById(id: string) {
+  const [row] = await db.select().from(rulesTable).where(eq(rulesTable.id, id)).limit(1);
 
   return row ? mapRuleRow(row) : null;
 }
 
-export function saveRule(rule: PaymentRule) {
+export async function saveRule(rule: PaymentRule) {
   const parsedRule = paymentRuleSchema.parse(rule);
 
-  db.insert(rulesTable)
+  await db
+    .insert(rulesTable)
     .values(serializeRule(parsedRule))
     .onConflictDoUpdate({
       target: rulesTable.id,
       set: serializeRule(parsedRule),
     })
-    .run();
+    .execute();
 
   return parsedRule;
 }
 
-export function setRuleStatus(id: string, status: RuleStatus) {
-  db.update(rulesTable).set({ status }).where(eq(rulesTable.id, id)).run();
-  return getRuleById(id);
+export async function setRuleStatus(id: string, status: RuleStatus) {
+  const [row] = await db
+    .update(rulesTable)
+    .set({ status })
+    .where(eq(rulesTable.id, id))
+    .returning();
+
+  return row ? mapRuleRow(row) : null;
 }
 
-function createExecution(params: {
+async function createExecution(params: {
   ruleId: string;
   status: RuleExecution["status"];
   mode: RunMode;
@@ -118,7 +120,8 @@ function createExecution(params: {
     mode: params.mode,
   });
 
-  db.insert(executionsTable)
+  await db
+    .insert(executionsTable)
     .values({
       id: execution.id,
       ruleId: execution.ruleId,
@@ -128,13 +131,13 @@ function createExecution(params: {
       errorMessage: execution.errorMessage,
       mode: execution.mode,
     })
-    .run();
+    .execute();
 
   return execution;
 }
 
 export async function runRuleById(id: string, options: { mode?: RunMode; userAddress?: string }) {
-  const rule = getRuleById(id);
+  const rule = await getRuleById(id);
 
   if (!rule) {
     throw new Error("Rule not found.");
@@ -144,7 +147,7 @@ export async function runRuleById(id: string, options: { mode?: RunMode; userAdd
   const evaluation = await evaluateRuleCondition(rule, options.userAddress || rule.userAddress);
 
   if (!evaluation.canExecute) {
-    const execution = createExecution({
+    const execution = await createExecution({
       ruleId: rule.id,
       status: "failed",
       mode,
@@ -168,7 +171,7 @@ export async function runRuleById(id: string, options: { mode?: RunMode; userAdd
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to prepare the rule transaction.";
-    const execution = createExecution({
+    const execution = await createExecution({
       ruleId: rule.id,
       status: "failed",
       mode,
@@ -184,7 +187,7 @@ export async function runRuleById(id: string, options: { mode?: RunMode; userAdd
   }
 
   if (mode === "simulate") {
-    const execution = createExecution({
+    const execution = await createExecution({
       ruleId: rule.id,
       status: "simulated",
       mode,
@@ -200,7 +203,7 @@ export async function runRuleById(id: string, options: { mode?: RunMode; userAdd
   }
 
   if (mode === "prepare") {
-    const execution = createExecution({
+    const execution = await createExecution({
       ruleId: rule.id,
       status: "prepared",
       mode,
@@ -218,7 +221,7 @@ export async function runRuleById(id: string, options: { mode?: RunMode; userAdd
   const demoWallet = getDemoWalletClient();
 
   if (!demoWallet) {
-    const execution = createExecution({
+    const execution = await createExecution({
       ruleId: rule.id,
       status: "prepared",
       mode,
@@ -242,20 +245,17 @@ export async function runRuleById(id: string, options: { mode?: RunMode; userAdd
       data: prepared.request.data,
     });
 
-    const execution = createExecution({
+    const execution = await createExecution({
       ruleId: rule.id,
       status: "success",
       mode,
       txHash,
     });
 
-    setRuleStatus(rule.id, "executed");
+    const updatedRule = await setRuleStatus(rule.id, "executed");
 
     return {
-      rule: {
-        ...rule,
-        status: "executed",
-      },
+      rule: updatedRule ?? { ...rule, status: "executed" },
       execution,
       canExecute: true,
       transaction: prepared.summary,
@@ -263,20 +263,17 @@ export async function runRuleById(id: string, options: { mode?: RunMode; userAdd
     } satisfies RunRuleResponse;
   } catch (error) {
     const message = error instanceof Error ? error.message : "Broadcast failed.";
-    const execution = createExecution({
+    const execution = await createExecution({
       ruleId: rule.id,
       status: "failed",
       mode,
       errorMessage: message,
     });
 
-    setRuleStatus(rule.id, "failed");
+    const updatedRule = await setRuleStatus(rule.id, "failed");
 
     return {
-      rule: {
-        ...rule,
-        status: "failed",
-      },
+      rule: updatedRule ?? { ...rule, status: "failed" },
       execution,
       canExecute: false,
       transaction: prepared.summary,

@@ -62,6 +62,57 @@ const aiRuleDraftJsonSchema = {
   },
 } as const;
 
+function summarizeOpenAIError(message: string) {
+  const normalized = message.replace(/\s+/g, " ").trim();
+  return normalized.length > 200
+    ? `${normalized.slice(0, 200)}...`
+    : normalized;
+}
+
+function getOpenAIModelUrl() {
+  return `${env.OPENAI_BASE_URL.replace(/\/$/, "")}/models/${encodeURIComponent(env.OPENAI_MODEL)}`;
+}
+
+export async function checkOpenAIConfiguration() {
+  if (!env.OPENAI_API_KEY) {
+    console.warn(
+      "OpenAI is not configured: OPENAI_API_KEY is missing. The backend will use the heuristic parser.",
+    );
+    return false;
+  }
+
+  try {
+    const response = await fetch(getOpenAIModelUrl(), {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      },
+      signal: AbortSignal.timeout(5_000),
+    });
+
+    console.dir(response);
+
+    if (!response.ok) {
+      const errorText = summarizeOpenAIError(await response.text());
+      console.warn(
+        `OpenAI configuration check failed for model "${env.OPENAI_MODEL}": ${response.status} ${errorText || response.statusText}. The backend will use the heuristic parser until this is fixed.`,
+      );
+      return false;
+    }
+
+    console.log(
+      `OpenAI is configured and reachable with model "${env.OPENAI_MODEL}".`,
+    );
+    return true;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.warn(
+      `OpenAI configuration check failed for model "${env.OPENAI_MODEL}": ${summarizeOpenAIError(message)}. The backend will use the heuristic parser until this is fixed.`,
+    );
+    return false;
+  }
+}
+
 async function parseRuleWithOpenAI(prompt: string, userAddress = "") {
   const response = await fetch(`${env.OPENAI_BASE_URL}/chat/completions`, {
     method: "POST",
@@ -121,8 +172,14 @@ async function parseRuleWithOpenAI(prompt: string, userAddress = "") {
   );
 }
 
-export async function parseRulePrompt(prompt: string, userAddress = ""): Promise<ParseRuleResponse> {
+export async function parseRulePrompt(
+  prompt: string,
+  userAddress = "",
+): Promise<ParseRuleResponse> {
   if (!env.OPENAI_API_KEY) {
+    console.log(
+      "Falling back to heuristic parser because OpenAI is not configured.",
+    );
     const fallbackRule = buildHeuristicParsedRule(prompt, userAddress);
 
     return {

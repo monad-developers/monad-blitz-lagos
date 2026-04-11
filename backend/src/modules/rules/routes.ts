@@ -19,15 +19,15 @@ const runRuleRequestSchema = z.object({
 });
 
 export const rulesRoutes = new Hono()
-  .get("/", (c) => c.json({ rules: listRules() }))
+  .get("/", async (c) => c.json({ rules: await listRules() }))
   .post("/", async (c) => {
     const body = saveRuleRequestSchema.parse(await c.req.json());
-    const savedRule = saveRule(body.rule);
+    const savedRule = await saveRule(body.rule);
 
     return c.json({ rule: savedRule }, 201);
   })
-  .get("/:id", (c) => {
-    const rule = getRuleById(c.req.param("id"));
+  .get("/:id", async (c) => {
+    const rule = await getRuleById(c.req.param("id"));
 
     if (!rule) {
       return c.json({ message: "Rule not found." }, 404);
@@ -35,8 +35,8 @@ export const rulesRoutes = new Hono()
 
     return c.json({ rule });
   })
-  .post("/:id/activate", (c) => {
-    const rule = setRuleStatus(c.req.param("id"), "active");
+  .post("/:id/activate", async (c) => {
+    const rule = await setRuleStatus(c.req.param("id"), "active");
 
     if (!rule) {
       return c.json({ message: "Rule not found." }, 404);

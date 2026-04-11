@@ -1,6 +1,6 @@
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { pgTable, text } from "drizzle-orm/pg-core";
 
-export const rulesTable = sqliteTable("rules", {
+export const rulesTable = pgTable("rules", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   userAddress: text("user_address").notNull(),
@@ -18,11 +18,11 @@ export const rulesTable = sqliteTable("rules", {
   createdAt: text("created_at").notNull(),
 });
 
-export const executionsTable = sqliteTable("executions", {
+export const executionsTable = pgTable("executions", {
   id: text("id").primaryKey(),
   ruleId: text("rule_id")
     .notNull()
-    .references(() => rulesTable.id),
+    .references(() => rulesTable.id, { onDelete: "cascade" }),
   txHash: text("tx_hash"),
   status: text("status").notNull(),
   executedAt: text("executed_at").notNull(),

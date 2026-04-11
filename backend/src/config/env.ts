@@ -9,20 +9,16 @@ const backendRoot = resolve(currentDir, "../..");
 
 loadEnv({ path: resolve(backendRoot, "../.env") });
 loadEnv({ path: resolve(backendRoot, ".env"), override: true });
-
-function resolveDatabasePath(input?: string) {
-  if (!input) {
-    return resolve(backendRoot, "data/paypilot.db");
-  }
-
-  return input.startsWith("/") ? input : resolve(backendRoot, input);
-}
+const defaultDatabaseUrl =
+  "postgresql://postgres:postgres@localhost:5432/paypilot?schema=public";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
   PORT: z.coerce.number().default(8787),
   FRONTEND_ORIGIN: z.string().default("http://localhost:5173"),
-  DATABASE_URL: z.string().default(resolve(backendRoot, "data/paypilot.db")),
+  DATABASE_URL: z.string().url().default(defaultDatabaseUrl),
   OPENAI_API_KEY: z.string().default(""),
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_MODEL: z.string().default("gpt-4o-mini"),
@@ -37,7 +33,7 @@ export const env = envSchema.parse({
   NODE_ENV: process.env.NODE_ENV,
   PORT: process.env.PORT,
   FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN,
-  DATABASE_URL: resolveDatabasePath(process.env.DATABASE_URL),
+  DATABASE_URL: process.env.DATABASE_URL,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENAI_BASE_URL: process.env.OPENAI_BASE_URL,
   OPENAI_MODEL: process.env.OPENAI_MODEL,

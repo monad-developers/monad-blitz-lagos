@@ -13,16 +13,16 @@
   "dependencies": {
     "@hono/node-server": "^1.13.7",
     "@paypilot/shared": "file:../shared",
-    "better-sqlite3": "^11.7.0",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.36.4",
     "hono": "^4.6.10",
+    "pg": "^8.13.1",
     "viem": "^2.21.54",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.10.1",
+    "@types/pg": "^8.11.10",
     "drizzle-kit": "^0.27.1",
     "tsup": "^8.3.5",
     "tsx": "^4.19.2",
