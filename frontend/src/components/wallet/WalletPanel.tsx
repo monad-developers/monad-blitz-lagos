@@ -1,5 +1,5 @@
 import { useBalance, useConnect, useDisconnect, useAccount, useChainId, useSwitchChain } from "wagmi";
-import { MONAD_TESTNET } from "@paypilot/shared";
+import { MONAD_TESTNET } from "../../shared";
 
 export function WalletPanel() {
   const { address, isConnected } = useAccount();

@@ -1,4 +1,4 @@
-import type { PaymentRule } from "@paypilot/shared";
+import type { PaymentRule } from "../shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../services/api";
 
