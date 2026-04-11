@@ -111,7 +111,7 @@ export function DashboardHeader({ profile, summary }: DashboardHeaderProps) {
             <button
               type="button"
               onClick={handleCopyWallet}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-app-muted transition-colors duration-200 hover:bg-app-soft hover:text-app focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-app-muted transition-colors duration-200 hover:bg-app-soft hover:text-app focus:outline-none focus:ring-2 focus:ring-primary/20"
               aria-label={copyState === "copied" ? "Wallet address copied" : "Copy wallet address"}
               title={copyState === "copied" ? "Copied" : "Copy wallet address"}
             >
@@ -134,7 +134,7 @@ export function DashboardHeader({ profile, summary }: DashboardHeaderProps) {
               setWithdrawError(null);
               setWithdrawTxHash(null);
             }}
-            className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-primary/35 bg-primary/10 px-4 py-2 text-base font-semibold text-primary transition-colors duration-200 hover:bg-primary/20 sm:text-lg"
+            className="mt-3 inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg border border-primary/35 bg-primary/10 px-4 py-2 text-base font-semibold text-primary transition-colors duration-200 hover:bg-primary/20 sm:text-lg"
           >
             {isWithdrawOpen ? "Close Withdrawal" : "Withdraw "}
           </button>
@@ -174,7 +174,7 @@ export function DashboardHeader({ profile, summary }: DashboardHeaderProps) {
                 type="button"
                 onClick={handleWithdraw}
                 disabled={isWithdrawing}
-                className="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-base font-semibold text-white transition-colors duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70 dark:text-[#2f1736] sm:text-lg"
+                className="mt-3 inline-flex min-h-10 w-full cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-2 text-base font-semibold text-white transition-colors duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70 dark:text-[#2f1736] sm:text-lg"
               >
                 {isWithdrawing ? "Submitting..." : "Send Withdrawal"}
               </button>

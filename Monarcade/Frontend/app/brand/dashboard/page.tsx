@@ -17,7 +17,7 @@ import type {
 import { pageContainerClass } from "@/lib/layout";
 import { useApiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth";
-import { fetchOnChainChallenges, fetchPublicChallenges } from "@/lib/challenge-source";
+import { fetchPublicChallenges } from "@/lib/challenge-source";
 import { API_BASE_URL, CHAIN_ID, CONTRACT_ADDRESS, MONAD_TESTNET } from "@/lib/monad";
 
 type ChallengeDetailResponse = {
@@ -42,6 +42,7 @@ type LeaderboardResponse = {
     rank: number;
     address: string;
     score: number;
+    txHash?: string;
   }>;
 };
 
@@ -103,6 +104,7 @@ function BrandDashboardPageContent() {
   const [startSuccessTx, setStartSuccessTx] = useState<string | null>(null);
   const [refundSuccessTx, setRefundSuccessTx] = useState<string | null>(null);
   const getAuthTokenRef = useRef(getAuthToken);
+  const apiRef = useRef(api);
   const hasLoadedRef = useRef(false);
 
   const walletAddress = useMemo(() => (user?.walletAddress ?? "").toLowerCase(), [user?.walletAddress]);
@@ -110,7 +112,8 @@ function BrandDashboardPageContent() {
 
   useEffect(() => {
     getAuthTokenRef.current = getAuthToken;
-  }, [getAuthToken]);
+    apiRef.current = api;
+  }, [getAuthToken, api]);
 
   useEffect(() => {
     hasLoadedRef.current = false;
@@ -135,26 +138,34 @@ function BrandDashboardPageContent() {
           setError(null);
         }
 
-        const [publicChallenges, onChainChallenges] = await Promise.all([
-          fetchPublicChallenges(),
-          fetchOnChainChallenges().catch(() => []),
-        ]);
+        const publicChallenges = await fetchPublicChallenges();
+
+        // Build a set of addresses that belong to this brand.
+        // The frontend wallet (smart wallet) may differ from the backend-stored
+        // address (embedded wallet), so we check both.
+        const brandAddresses = new Set<string>([walletAddress]);
+
+        const profileResponse = await apiRef.current
+          .get<{ profile: BrandProfileSummary & { brandAddress?: string } }>("/brand/profile")
+          .catch(() => null);
+        const profileBrandAddress = profileResponse?.profile?.brandAddress?.toLowerCase();
+        if (profileBrandAddress) {
+          brandAddresses.add(profileBrandAddress);
+        }
 
         const mergedById = new Map<number, BrandCampaign>();
-        for (const source of [...(publicChallenges.entries ?? []), ...onChainChallenges]) {
+        for (const source of publicChallenges.entries ?? []) {
           const entryBrandAddress = (source.brandAddress ?? "").toLowerCase();
-          if (entryBrandAddress !== walletAddress) continue;
+          if (!brandAddresses.has(entryBrandAddress)) continue;
 
-          const existing = mergedById.get(source.challengeId);
           mergedById.set(source.challengeId, {
-            ...existing,
             challengeId: source.challengeId,
-            name: existing?.name || source.name,
-            logoPath: existing?.logoPath ?? source.logoPath,
-            prizePool: existing?.prizePool || source.prizePool,
-            started: existing?.started || source.started,
-            startTime: existing?.startTime ?? source.startTime,
-            endTime: existing?.endTime ?? source.endTime,
+            name: source.name,
+            logoPath: source.logoPath,
+            prizePool: source.prizePool,
+            started: source.started,
+            startTime: source.startTime,
+            endTime: source.endTime,
             status: "pending",
           });
         }
@@ -180,12 +191,6 @@ function BrandDashboardPageContent() {
             };
           }),
         );
-
-        const profileResponse = await api
-          .get<{ profile: BrandProfileSummary }>("/brand/profile", {
-            headers: { "x-kyc-verified": "true" },
-          })
-          .catch(() => null);
 
         const publicClient = createPublicClient({
           chain: MONAD_TESTNET,
@@ -262,7 +267,7 @@ function BrandDashboardPageContent() {
     return () => {
       cancelled = true;
     };
-  }, [api, isAuthLoading, refreshKey, walletAddress]);
+  }, [isAuthLoading, refreshKey, walletAddress]);
 
   const handleStartCampaign = async (challengeId: number) => {
     try {

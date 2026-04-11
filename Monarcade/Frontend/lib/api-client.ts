@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "./auth";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { API_BASE_URL } from "@/lib/monad";
 
 type ApiMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -148,26 +148,29 @@ export function useApiClient() {
     [getAuthTokenWithRetry],
   );
 
-  return {
-    get: <T,>(url: string, options?: { headers?: Record<string, string> }) =>
-      request<T>("GET", url, options),
-    post: <T,>(
-      url: string,
-      body?: unknown,
-      options?: { headers?: Record<string, string> },
-    ) => request<T>("POST", url, { body, ...options }),
-    put: <T,>(
-      url: string,
-      body?: unknown,
-      options?: { headers?: Record<string, string> },
-    ) => request<T>("PUT", url, { body, ...options }),
-    delete: <T,>(url: string, options?: { headers?: Record<string, string> }) =>
-      request<T>("DELETE", url, options),
-    patch: <T,>(
-      url: string,
-      body?: unknown,
-      options?: { headers?: Record<string, string> },
-    ) => request<T>("PATCH", url, { body, ...options }),
-    request,
-  };
+  return useMemo(
+    () => ({
+      get: <T,>(url: string, options?: { headers?: Record<string, string> }) =>
+        request<T>("GET", url, options),
+      post: <T,>(
+        url: string,
+        body?: unknown,
+        options?: { headers?: Record<string, string> },
+      ) => request<T>("POST", url, { body, ...options }),
+      put: <T,>(
+        url: string,
+        body?: unknown,
+        options?: { headers?: Record<string, string> },
+      ) => request<T>("PUT", url, { body, ...options }),
+      delete: <T,>(url: string, options?: { headers?: Record<string, string> }) =>
+        request<T>("DELETE", url, options),
+      patch: <T,>(
+        url: string,
+        body?: unknown,
+        options?: { headers?: Record<string, string> },
+      ) => request<T>("PATCH", url, { body, ...options }),
+      request,
+    }),
+    [request],
+  );
 }

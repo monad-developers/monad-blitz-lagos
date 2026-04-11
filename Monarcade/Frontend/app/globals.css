@@ -1,26 +1,154 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #853953;
+  --color-secondary: #612d53;
+  --color-tertiary: #f3f4f4;
+  --color-neutral: #9f8383;
+
+  --color-background: #ffffff;
+  --color-foreground: #351428;
+  --font-sans: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --bg: #ffffff;
+  --bg-soft: #f1e8ed;
+  --surface: #fffdfd;
+  --text: #351428;
+  --text-muted: #6b5460;
+  --border: color-mix(in srgb, #612d53 6%, #ffffff);
+  --shadow: 0 20px 42px color-mix(in srgb, #853953 14%, transparent);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+.dark {
+  --color-primary: #c8aaaa;
+  --color-secondary: #f3f4f4;
+  --color-tertiary: #612d53;
+  --color-neutral: #9f8383;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: #2f1736;
+  --color-foreground: #faf6fb;
+
+  --bg: #2f1736;
+  --bg-soft: #3a1e43;
+  --surface: #4b2758;
+  --text: #faf6fb;
+  --text-muted: #e9dce5;
+  --border: color-mix(in srgb, #f3f4f4 10%, #612d53);
+  --shadow: 0 20px 42px color-mix(in srgb, #000000 38%, transparent);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--color-primary) 8%, transparent), transparent 44%),
+    radial-gradient(circle at 85% 12%, color-mix(in srgb, var(--color-secondary) 6%, transparent), transparent 38%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+/* Subtle typography bumps — just enough for readability without bloating layout */
+.page-typography {
+  font-size: 1rem;
+}
+
+.player-dashboard-typography {
+  font-size: 1rem;
+}
+
+.home-snap {
+  scroll-snap-type: y proximity;
+}
+
+.home-section {
+  min-height: 100svh;
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  display: flex;
+  align-items: center;
+}
+
+.home-section-compact {
+  min-height: auto;
+  align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+  .home-section {
+    min-height: auto;
+    scroll-snap-stop: normal;
+  }
+}
+
+.bg-app {
+  background-color: var(--bg);
+}
+
+.bg-app-soft {
+  background-color: var(--bg-soft);
+}
+
+.bg-app-surface {
+  background-color: var(--surface);
+}
+
+.text-app {
+  color: var(--text);
+}
+
+.text-app-muted {
+  color: var(--text-muted);
+}
+
+.border-app {
+  border-color: var(--border);
+}
+
+.shadow-app {
+  box-shadow: var(--shadow);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.dark .text-secondary {
+  color: var(--color-primary);
+}
+
+.bg-tertiary {
+  background-color: var(--color-tertiary);
+}
+
+.text-neutral {
+  color: var(--text-muted);
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(85vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti-fall 2.5s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-confetti {
+    animation: none;
+    display: none;
+  }
 }

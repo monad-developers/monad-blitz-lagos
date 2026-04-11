@@ -55,7 +55,7 @@ export default function ChallengePage() {
         const isLive = entry.started && (entry.endTime ?? 0) > nowSec;
 
         return {
-          id: entry.metadataHash ?? String(entry.challengeId),
+          id: String(entry.challengeId),
           brandName: entry.name,
           brandInitials: getInitials(entry.name),
           brandLogoPath: entry.logoPath,

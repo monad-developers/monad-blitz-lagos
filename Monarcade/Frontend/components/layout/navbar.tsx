@@ -122,7 +122,7 @@ export function Navbar() {
             <button
               type="button"
               aria-label="Toggle navigation menu"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-app-soft text-app"
+              className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-app-soft text-app transition-colors hover:bg-app"
               onClick={() => setMenuOpen((currentState) => !currentState)}
             >
               <svg
@@ -153,7 +153,7 @@ export function Navbar() {
               <button
                 type="button"
                 aria-label="Close navigation menu"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-app-soft text-app"
+                className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-app-soft text-app transition-colors hover:bg-app"
                 onClick={() => setMenuOpen(false)}
               >
                 <svg
@@ -191,7 +191,7 @@ export function Navbar() {
                     setMenuOpen(false);
                     void logout();
                   }}
-                  className="col-span-2 rounded-lg bg-primary px-3.5 py-3 text-base font-semibold text-white dark:text-[#2f1736]"
+                  className="col-span-2 cursor-pointer rounded-lg bg-primary px-3.5 py-3 text-base font-semibold text-white transition-all hover:brightness-110 dark:text-[#2f1736]"
                   style={{ color: "var(--color-white)" }}
                 >
                   Logout
@@ -208,7 +208,7 @@ export function Navbar() {
                   <Link
                     href="/brands/signup"
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-lg bg-primary px-3.5 py-3 text-base font-semibold text-white primary dark:text-[#2f1736]"
+                    className="cursor-pointer rounded-lg bg-primary px-3.5 py-3 text-center text-base font-semibold text-white transition-all hover:brightness-110 dark:text-[#2f1736]"
                   >
                     Create
                   </Link>

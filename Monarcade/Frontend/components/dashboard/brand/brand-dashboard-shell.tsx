@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
+import { ChallengeQR } from "@/components/ui/challenge-qr";
 import { type Address, isAddress, parseEther } from "viem";
 
 import { CHAIN_ID } from "@/lib/monad";
@@ -182,7 +183,7 @@ function CampaignCard({
   onRefundCampaign: (challengeId: number) => Promise<void> | void;
 }) {
   const [linkCopyState, setLinkCopyState] = useState<"idle" | "copied">("idle");
-  const challengeIdentifier = campaign.metadataHash ?? String(campaign.challengeId);
+  const challengeIdentifier = String(campaign.challengeId);
   const challengeLink =
     typeof window === "undefined"
       ? `/challenge/${challengeIdentifier}`
@@ -236,25 +237,28 @@ function CampaignCard({
             type="button"
             onClick={() => void onStartCampaign(campaign.challengeId)}
             disabled={isStarting}
-            className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-primary px-5 py-3 text-base font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+            className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-2xl bg-primary px-6 py-3.5 text-lg font-semibold text-white shadow-app transition hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             style={{ color: "var(--color-white)" }}
           >
-            {isStarting ? "Starting..." : "Start campaign"}
+            {isStarting ? "Starting..." : "Start Challenge"}
           </button>
         ) : campaign.status === "live" ? (
-          <button
-            type="button"
-            onClick={() => void handleCopyChallengeLink()}
-            className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-app-soft px-5 py-3 text-base font-semibold text-app transition hover:bg-app"
-          >
-            {linkCopyState === "copied" ? "Challenge link copied" : "Copy challenge link"}
-          </button>
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => void handleCopyChallengeLink()}
+              className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center rounded-2xl bg-app-soft px-5 py-3 text-base font-semibold text-app transition hover:bg-app"
+            >
+              {linkCopyState === "copied" ? "Challenge link copied" : "Copy challenge link"}
+            </button>
+            <ChallengeQR challengeId={campaign.challengeId} size={100} />
+          </div>
         ) : refundState.eligible ? (
           <button
             type="button"
             onClick={() => void onRefundCampaign(campaign.challengeId)}
             disabled={isRefunding}
-            className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-app-soft px-5 py-3 text-base font-semibold text-app transition hover:bg-app disabled:opacity-60"
+            className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-2xl bg-app-soft px-5 py-3 text-base font-semibold text-app transition hover:bg-app disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isRefunding ? "Processing refund..." : "Refund challenge"}
           </button>
@@ -535,7 +539,7 @@ function WalletPanel({
             type="button"
             onClick={() => void handleWithdraw()}
             disabled={isWithdrawing}
-            className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-app-soft px-4 py-3 text-base font-semibold text-app transition hover:bg-app disabled:opacity-60"
+            className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-2xl bg-app-soft px-4 py-3 text-base font-semibold text-app transition hover:bg-app disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isWithdrawing ? "Submitting..." : "Send transfer"}
           </button>

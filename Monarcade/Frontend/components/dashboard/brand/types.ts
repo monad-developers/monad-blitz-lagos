@@ -30,6 +30,7 @@ export type BrandCampaign = {
     rank: number;
     address: string;
     score: number;
+    txHash?: string;
   }>;
   refunded?: boolean;
   status: BrandCampaignStatus;

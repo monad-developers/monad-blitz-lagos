@@ -9,7 +9,7 @@ import { PlayerDashboardShell } from "@/components/dashboard/player/player-dashb
 import type { ChallengeEntry, ChallengeCategory } from "@/lib/player-dashboard";
 import { challengeCategories, rewardsHistory, recentActivity } from "@/lib/player-dashboard";
 import type { BackendChallenge } from "@/lib/challenge-source";
-import { fetchOnChainChallenges, fetchPublicChallenges } from "@/lib/challenge-source";
+import { fetchPublicChallenges } from "@/lib/challenge-source";
 import { pageContainerClass } from "@/lib/layout";
 import { MONAD_TESTNET } from "@/lib/monad";
 import { useAuth } from "@/lib/auth";
@@ -65,7 +65,7 @@ const mapChallengesByCategory = (entries: BackendChallenge[]): Record<ChallengeC
   const nowSec = Math.floor(Date.now() / 1000);
 
   const toEntry = (challenge: BackendChallenge, status: "Live" | "Upcoming" | "Closed"): ChallengeEntry => ({
-    id: challenge.metadataHash ?? String(challenge.challengeId),
+    id: String(challenge.challengeId),
     title: challenge.name,
     brandName: challenge.name,
     brandInitials: getBrandInitials(challenge.name),
@@ -136,33 +136,7 @@ export default function PlayerDashboardPage() {
         setError(null);
 
         const challengesRes = await fetchPublicChallenges();
-        const mergedById = new Map<number, BackendChallenge>();
-
-        for (const challenge of challengesRes.entries ?? []) {
-          mergedById.set(challenge.challengeId, challenge);
-        }
-
-        const onChainEntries = await fetchOnChainChallenges();
-        for (const challenge of onChainEntries) {
-          const existing = mergedById.get(challenge.challengeId);
-          if (!existing) {
-            mergedById.set(challenge.challengeId, challenge);
-            continue;
-          }
-
-          mergedById.set(challenge.challengeId, {
-            ...challenge,
-            ...existing,
-            metadataHash: existing.metadataHash ?? challenge.metadataHash,
-            started: existing.started || challenge.started,
-            startTime: existing.startTime ?? challenge.startTime,
-            endTime: existing.endTime ?? challenge.endTime,
-            logoPath: existing.logoPath ?? challenge.logoPath,
-            brandAddress: existing.brandAddress ?? challenge.brandAddress,
-          });
-        }
-
-        const finalEntries = Array.from(mergedById.values()).sort((a, b) => b.challengeId - a.challengeId);
+        const finalEntries = (challengesRes.entries ?? []).sort((a, b) => b.challengeId - a.challengeId);
         const challengesByCategory = mapChallengesByCategory(finalEntries);
         const liveParticipation = challengesByCategory.available.length;
 

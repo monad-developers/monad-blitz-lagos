@@ -10,7 +10,7 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
 
   return (
     <article
-      className={`group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-[color:var(--border)] p-4 shadow-app transition-all duration-300 sm:rounded-3xl sm:p-7 lg:p-8 xl:p-10 2xl:p-11 ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[color:var(--border)] p-4 shadow-app transition-all duration-300 sm:rounded-3xl sm:p-5 lg:p-6 ${
         isLive
           ? "bg-app-surface hover:-translate-y-1 hover:shadow-xl"
           : "bg-app-soft/70"
@@ -41,30 +41,30 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
             />
           )}
           <div className="min-w-0">
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-app-muted sm:text-base">Brand</p>
-            <h3 className="text-[1.35rem] font-semibold tracking-tight text-app sm:text-[1.75rem] xl:text-[2.1rem] 2xl:text-[2.4rem]">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-app-muted sm:text-xs">Brand</p>
+            <h3 className="text-lg font-semibold tracking-tight text-app sm:text-xl lg:text-2xl">
               {challenge.brandName}
             </h3>
           </div>
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 xl:mt-9 xl:gap-4 2xl:mt-10 2xl:gap-5">
-        <div className="rounded-2xl bg-app px-4 py-4 sm:px-5 xl:px-6 xl:py-5 2xl:px-7 2xl:py-6">
-          <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-app-muted sm:text-base">Prize</p>
-          <p className="mt-2 text-[1rem] font-semibold text-app sm:text-2xl xl:text-3xl 2xl:text-[2.35rem]">{challenge.prize}</p>
+      <div className="mt-4 grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:mt-5 sm:gap-3">
+        <div className="rounded-2xl bg-app px-4 py-3 sm:px-5 sm:py-4">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-app-muted sm:text-xs">Prize</p>
+          <p className="mt-1 text-lg font-semibold text-app sm:text-xl lg:text-2xl">{challenge.prize}</p>
         </div>
-        <div className="rounded-2xl bg-app px-4 py-4 min-[420px]:text-right sm:px-5 xl:px-6 xl:py-5 2xl:px-7 2xl:py-6">
-          <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-app-muted sm:text-base">
+        <div className="rounded-2xl bg-app px-4 py-3 min-[420px]:text-right sm:px-5 sm:py-4">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-app-muted sm:text-xs">
             {isLive ? "Ends" : "Duration"}
           </p>
-          <p className="mt-2 text-[1rem] font-semibold text-app sm:text-2xl xl:text-3xl 2xl:text-[2.35rem]">{challenge.time}</p>
+          <p className="mt-1 text-lg font-semibold text-app sm:text-xl lg:text-2xl">{challenge.time}</p>
         </div>
       </div>
 
       <Link
-        href={isLive ? `/challenge/${challenge.id}` : "/challenge"}
-        className={`mt-6 inline-flex w-full min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-semibold transition-all duration-200 active:scale-[0.99] sm:mt-auto sm:min-h-14 sm:text-lg xl:mt-8 xl:min-h-16 xl:text-xl 2xl:mt-9 2xl:min-h-18 2xl:text-2xl ${
+        href={`/challenge/${challenge.id}`}
+        className={`mt-5 inline-flex w-full min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.99] sm:mt-auto sm:min-h-12 sm:text-base ${
           isLive
             ? "bg-primary text-white hover:brightness-110 dark:text-[#2f1736]"
             : "bg-app-surface text-app-muted hover:bg-app"

@@ -118,15 +118,16 @@ export function useAuth(): UseAuthReturn {
     }
 
     try {
-      const identityToken = await getIdentityToken();
-      if (identityToken) {
-        return identityToken;
+      // Use cached access token first (instant, no network call).
+      // Only fall back to identity token (network call) if access token unavailable.
+      const accessToken = await privy.getAccessToken();
+      if (accessToken) {
+        return accessToken;
       }
 
-      const accessToken = await privy.getAccessToken();
-      return accessToken || null;
+      const identityToken = await getIdentityToken();
+      return identityToken || null;
     } catch {
-      // Token acquisition can fail during session refreshes; callers handle null tokens.
       return null;
     }
   }, [privy]);

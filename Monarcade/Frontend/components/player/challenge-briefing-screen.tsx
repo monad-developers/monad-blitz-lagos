@@ -1,274 +1,231 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
 import type { ChallengeDetails } from "@/lib/challenge-details";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { pageContainerClass } from "@/lib/layout";
+import { useAuth } from "@/lib/auth";
 
 type ChallengeBriefingScreenProps = {
   challenge: ChallengeDetails;
 };
 
-const formatCountdown = (seconds: number) => {
-  const safeSeconds = Math.max(seconds, 0);
-  const minutes = Math.floor(safeSeconds / 60);
-  const remainingSeconds = safeSeconds % 60;
-
-  return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
-};
-
-const getAudioContext = () => {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const AudioContextClass =
-    window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-
-  return AudioContextClass ? new AudioContextClass() : null;
-};
-
-const playCountdownTone = (audioContext: AudioContext, secondsLeft: number) => {
-  const now = audioContext.currentTime;
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-
-  oscillator.type = secondsLeft <= 5 ? "square" : "sawtooth";
-  oscillator.frequency.setValueAtTime(secondsLeft <= 5 ? 1320 : 980, now);
-
-  gainNode.gain.setValueAtTime(0.0001, now);
-  gainNode.gain.exponentialRampToValueAtTime(secondsLeft <= 5 ? 0.34 : 0.24, now + 0.01);
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  oscillator.start(now);
-  oscillator.stop(now + 0.2);
-};
-
 export function ChallengeBriefingScreen({ challenge }: ChallengeBriefingScreenProps) {
-  const router = useRouter();
-  const [timeLeft, setTimeLeft] = useState(challenge.prepSeconds);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const hasNavigatedRef = useRef(false);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setTimeLeft((currentValue) => {
-        if (currentValue <= 1) {
-          window.clearInterval(intervalId);
-          return 0;
-        }
-
-        return currentValue - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(intervalId);
-  }, [challenge.prepSeconds]);
-
-  useEffect(() => {
-    if (timeLeft !== 0 || hasNavigatedRef.current) {
-      return;
-    }
-
-    hasNavigatedRef.current = true;
-    router.replace(challenge.redirectPath);
-  }, [challenge.redirectPath, router, timeLeft]);
-
-  useEffect(() => {
-    if (timeLeft <= 0 || timeLeft >= challenge.prepSeconds) {
-      return;
-    }
-
-    const audioContext = audioContextRef.current ?? getAudioContext();
-    if (!audioContext) {
-      return;
-    }
-
-    audioContextRef.current = audioContext;
-
-    if (audioContext.state === "suspended") {
-      void audioContext.resume().then(() => playCountdownTone(audioContext, timeLeft));
-      return;
-    }
-
-    playCountdownTone(audioContext, timeLeft);
-  }, [challenge.prepSeconds, timeLeft]);
-
-  useEffect(() => {
-    return () => {
-      if (audioContextRef.current) {
-        void audioContextRef.current.close().catch(() => {});
-      }
-    };
-  }, []);
+  const { isAuthenticated, login, isLoading } = useAuth();
 
   return (
-    <div className="page-typography player-dashboard-typography min-h-screen bg-app text-app">
+    <div className="page-typography min-h-screen bg-app text-app">
       <Navbar />
 
-      <main className="w-full pb-14 pt-4 sm:pt-6 lg:pb-18 lg:pt-8">
+      <main className="w-full py-8 sm:py-10 lg:py-12">
         <section className={`${pageContainerClass} space-y-6 sm:space-y-8`}>
-          <div className="flex items-center justify-between gap-4">
+
+          {/* Header */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <Link
-              href="/player/dashboard"
-              className="inline-flex items-center gap-2 text-lg text-app-muted transition-colors duration-200 hover:text-app sm:text-xl"
+              href="/challenge"
+              className="inline-flex items-center gap-2 text-sm text-app-muted transition-colors duration-200 hover:text-app"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back to Dashboard
+              All Challenges
             </Link>
-            <p className="text-base font-semibold uppercase tracking-[0.18em] text-app-muted sm:text-lg">
-              Starts automatically in {formatCountdown(timeLeft)}
-            </p>
+
+            {challenge.heroLabel ? (
+              <span className="rounded-full bg-app-soft px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-app-muted">
+                {challenge.heroLabel}
+              </span>
+            ) : null}
           </div>
 
-          <section className="relative overflow-hidden rounded-[2rem] border border-app bg-app-surface p-5 shadow-app sm:p-7 lg:p-9">
+          {/* Hero — Prize + CTA */}
+          <section className="relative overflow-hidden rounded-[2rem] border border-app bg-app-surface p-6 shadow-app sm:p-8">
             <div
-              className="pointer-events-none absolute inset-x-0 top-0 h-48 opacity-90"
+              className="pointer-events-none absolute inset-0 opacity-90"
               aria-hidden="true"
               style={{
                 background:
-                  "radial-gradient(circle at top left, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 42%), radial-gradient(circle at top right, color-mix(in srgb, var(--color-secondary) 18%, transparent), transparent 44%)",
+                  "radial-gradient(circle at 12% 12%, color-mix(in srgb, var(--color-primary) 20%, transparent), transparent 46%), radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--color-secondary) 18%, transparent), transparent 38%)",
               }}
             />
-
-            <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
-              <div className="lg:col-span-7">
-                {challenge.heroLabel ? (
-                  <div className="inline-flex rounded-full bg-app px-4 py-2 text-base font-semibold uppercase tracking-[0.18em] text-app-muted sm:text-lg">
-                    {challenge.heroLabel}
-                  </div>
-                ) : null}
-
-                <div className="mt-5 flex items-center gap-4 sm:gap-5">
-                  <div
-                    className="flex h-18 w-18 items-center justify-center rounded-[1.6rem] text-2xl font-semibold sm:h-24 sm:w-24 sm:text-3xl"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 92%, white), color-mix(in srgb, var(--color-secondary) 88%, white))",
-                      color: "var(--color-tertiary)",
-                      boxShadow: "var(--shadow)",
-                    }}
-                  >
-                    {challenge.logoText}
-                  </div>
-
-                  <div>
-                    <p className="text-lg font-semibold uppercase tracking-[0.16em] text-app-muted sm:text-xl">
-                      Brand Name
-                    </p>
-                    <h1 className="mt-1 text-3xl font-semibold tracking-tight text-app sm:text-4xl lg:text-[3.25rem]">
-                      {challenge.brandTitle}
-                    </h1>
-                    <p className="mt-2 max-w-2xl text-lg text-app-muted sm:text-xl">{challenge.tagline}</p>
-                  </div>
-                </div>
-
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-app-muted sm:text-xl">
-                 
+            <div className="relative flex flex-wrap items-center justify-between gap-5">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-app-muted">Challenge Prize</p>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-app sm:text-4xl">
+                  {challenge.reward.headline}
                 </p>
-
-                <div className="mt-14 rounded-[1.75rem] border border-app bg-app p-5 sm:mt-16 sm:p-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <h2 className="text-xl font-semibold text-app sm:text-2xl">Random Facts</h2>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    {challenge.facts.map((fact) => (
-                      <div key={fact} className="rounded-2xl bg-app-surface px-4 py-3 text-lg leading-8 text-app-muted sm:text-xl">
-                        {fact}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-14 rounded-[1.75rem] border border-app bg-app/75 p-5 sm:mt-16 sm:p-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <h2 className="text-xl font-semibold text-app sm:text-2xl">Instructions</h2>
-                  </div>
-
-                  <div className="mt-4 space-y-3">
-                    {challenge.instructions.map((instruction, index) => (
-                      <div key={instruction} className="flex items-start gap-3 rounded-2xl bg-app-surface px-4 py-3">
-                        <span
-                          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-base font-semibold text-white dark:text-[#2f1736]"
-                          style={{ color: "var(--color-white)" }}
-                        >
-                          {index + 1}
-                        </span>
-                        <p className="text-lg leading-8 text-app-muted sm:text-xl">{instruction}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <p className="mt-2 text-sm text-app-muted">{challenge.reward.details}</p>
               </div>
 
-              <aside className="lg:col-span-5">
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                  <div className="px-1 py-1 sm:px-2">
-                    <p className="text-lg font-semibold uppercase tracking-[0.16em] text-app-muted sm:text-xl">Reward</p>
-                    <h2 className="mt-3 text-3xl font-semibold text-app sm:text-4xl">{challenge.reward.headline}</h2>
-                    <p className="mt-3 text-lg leading-8 text-app-muted sm:text-xl">{challenge.reward.details}</p>
-                    <p className="mt-4 text-lg text-app-muted sm:text-xl">
-                      {challenge.reward.payoutWindow}
-                    </p>
-                  </div>
-
-                  <div className="rounded-[1.75rem] border border-app bg-primary px-5 py-5 text-white shadow-app dark:text-[#2f1736] sm:col-span-2 sm:px-6 sm:py-6 lg:col-span-1 lg:mt-72">
-                    <p
-                      className="text-lg font-semibold uppercase tracking-[0.16em] text-white/80 dark:text-[#2f1736]/75 sm:text-xl"
-                      style={{ color: "var(--color-white)" }}
+              {isLoading ? (
+                <div className="h-12 w-36 animate-pulse rounded-2xl bg-app-soft" />
+              ) : challenge.status === "pending" ? (
+                <div className="flex flex-col items-end gap-2">
+                  <span className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-app-soft px-7 py-3 text-lg font-semibold text-app-muted sm:min-h-14 sm:text-xl">
+                    Starting Soon
+                  </span>
+                  {isAuthenticated ? (
+                    <Link
+                      href="/brand/dashboard"
+                      className="text-xs text-primary underline hover:brightness-110"
                     >
-                      Countdown
-                    </p>
-                    <p
-                      className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl"
-                      style={{ color: "var(--color-white)" }}
-                    >
-                      {formatCountdown(timeLeft)}
-                    </p>
-                  
-                    <button
-                      type="button"
-                      onClick={() => router.replace(challenge.redirectPath)}
-                      className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-app-surface px-5 py-3 text-xl font-semibold text-app transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 sm:min-h-14 sm:text-2xl"
-                    >
-                      Start Now
-                    </button>
-                  </div>
+                      Brand owner? Start it from dashboard
+                    </Link>
+                  ) : null}
                 </div>
-              </aside>
+              ) : challenge.status === "ended" ? (
+                <Link
+                  href={`/challenge/${challenge.id}/leaderboard`}
+                  className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-app-soft px-7 py-3 text-lg font-semibold text-app-muted transition-all duration-200 hover:bg-app sm:min-h-14 sm:text-xl"
+                >
+                  View Results
+                </Link>
+              ) : isAuthenticated ? (
+                <Link
+                  href={challenge.redirectPath}
+                  className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-primary px-7 py-3 text-lg font-semibold text-white transition-all duration-200 hover:brightness-110 dark:text-[#2f1736] sm:min-h-14 sm:text-xl"
+                  style={{ color: "var(--color-white)" }}
+                >
+                  Play Now
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => login()}
+                  className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-primary px-7 py-3 text-lg font-semibold text-white transition-all duration-200 hover:brightness-110 dark:text-[#2f1736] sm:min-h-14 sm:text-xl"
+                  style={{ color: "var(--color-white)" }}
+                >
+                  Sign In to Play
+                </button>
+              )}
             </div>
           </section>
 
+          {/* How It Works — 3 Rounds */}
           <section className="rounded-[2rem] border border-app bg-app-surface p-5 shadow-app sm:p-7">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-base font-semibold uppercase tracking-[0.16em] text-app-muted sm:text-lg">How this challenge works</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-app sm:text-3xl">Two rounds. Thirty seconds total.</h2>
-              </div>
-             
-            </div>
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-app-muted">How it works</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-app sm:text-3xl">
+              Five rounds. Speed is everything.
+            </h2>
+            <p className="mt-2 text-sm text-app-muted">
+              Max score: 300 points. Every round is speed-weighted — faster correct answers earn more.
+            </p>
 
-            <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {challenge.rounds.map((round) => (
+            <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+              {challenge.rounds.map((round, index) => (
                 <article key={round.title} className="rounded-[1.75rem] border border-app bg-app p-5 sm:p-6">
                   <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-base font-semibold uppercase tracking-[0.16em] text-app-muted sm:text-lg">{round.title}</p>
-                      <h3 className="mt-2 text-2xl font-semibold text-app sm:text-3xl">{round.duration}</h3>
-                    </div>
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white dark:text-[#2f1736]" style={{ color: "var(--color-white)" }}>
+                      {index + 1}
+                    </span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-app-muted">{round.duration}</span>
                   </div>
-                  <p className="mt-4 text-lg leading-8 text-app-muted sm:text-xl">{round.description}</p>
+                  <h3 className="mt-3 text-lg font-semibold text-app">{round.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-app-muted">{round.description}</p>
                 </article>
               ))}
             </div>
           </section>
+
+          {/* Strategy Tips */}
+          <section className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
+            <div className="rounded-[2rem] border border-app bg-app-surface p-5 shadow-app sm:p-7 lg:col-span-7">
+              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-app-muted">Strategy</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-app sm:text-3xl">
+                Tips to top the leaderboard
+              </h2>
+
+              <div className="mt-5 space-y-3">
+                {challenge.instructions.map((tip, index) => (
+                  <div key={index} className="flex items-start gap-3 rounded-2xl bg-app px-4 py-3">
+                    <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-app-soft text-xs font-bold text-app-muted">
+                      {index + 1}
+                    </span>
+                    <p className="text-sm leading-relaxed text-app-muted">{tip}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <aside className="space-y-5 lg:col-span-5">
+              {/* Why Speed Matters */}
+              <div className="rounded-[2rem] border border-app bg-app-surface p-5 shadow-app sm:p-6">
+                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-app-muted">Why speed matters</p>
+                <div className="mt-3 space-y-3">
+                  <div className="rounded-2xl bg-app px-4 py-3">
+                    <p className="text-sm font-semibold text-app">Speed-weighted scoring</p>
+                    <p className="mt-1 text-xs text-app-muted">
+                      All five rounds reward speed. A correct answer in 1 second scores higher than the same answer in 10 seconds.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-app px-4 py-3">
+                    <p className="text-sm font-semibold text-app">On-chain in ~400ms</p>
+                    <p className="mt-1 text-xs text-app-muted">
+                      Your score settles on Monad blockchain with sub-second finality. Every result is verifiable and permanent.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-app px-4 py-3">
+                    <p className="text-sm font-semibold text-app">Top scorers win</p>
+                    <p className="mt-1 text-xs text-app-muted">
+                      Prize pool splits among the top performers. Rank is determined by total score — ties broken by speed.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payout Info */}
+              <div className="rounded-[2rem] border border-app bg-app-surface p-5 shadow-app sm:p-6">
+                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-app-muted">Payout</p>
+                <p className="mt-2 text-sm text-app-muted">{challenge.reward.payoutWindow}</p>
+              </div>
+            </aside>
+          </section>
+
+          {/* Bottom CTA */}
+          <div className="flex justify-center">
+            {challenge.status === "pending" ? (
+              <div className="flex flex-col items-center gap-3">
+                <span className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-app-soft px-10 py-3 text-xl font-semibold text-app-muted">
+                  This challenge hasn&apos;t started yet
+                </span>
+                {isAuthenticated ? (
+                  <Link
+                    href="/brand/dashboard"
+                    className="text-sm text-primary underline hover:brightness-110"
+                  >
+                    Go to Brand Dashboard to start this challenge
+                  </Link>
+                ) : null}
+              </div>
+            ) : challenge.status === "ended" ? (
+              <Link
+                href={`/challenge/${challenge.id}/leaderboard`}
+                className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-app-soft px-10 py-3 text-xl font-semibold text-app-muted transition-all duration-200 hover:bg-app"
+              >
+                Challenge ended — View Leaderboard
+              </Link>
+            ) : isAuthenticated ? (
+              <Link
+                href={challenge.redirectPath}
+                className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-primary px-10 py-3 text-xl font-semibold text-white transition-all duration-200 hover:brightness-110 dark:text-[#2f1736]"
+                style={{ color: "var(--color-white)" }}
+              >
+                Play Now
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => login()}
+                className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-primary px-10 py-3 text-xl font-semibold text-white transition-all duration-200 hover:brightness-110 dark:text-[#2f1736]"
+                style={{ color: "var(--color-white)" }}
+              >
+                Sign In to Play
+              </button>
+            )}
+          </div>
+
         </section>
       </main>
 

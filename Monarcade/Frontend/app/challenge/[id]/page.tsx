@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ChallengeBriefingScreen } from "@/components/player/challenge-briefing-screen";
 import { getChallengeDetails } from "@/lib/challenge-details";
 
@@ -14,6 +14,11 @@ export default async function ChallengeDetailsPage({ params }: ChallengeDetailsP
 
   if (!challenge) {
     notFound();
+  }
+
+  // Redirect hash-based URLs to numeric IDs
+  if (challenge.id !== id) {
+    redirect(`/challenge/${challenge.id}`);
   }
 
   return <ChallengeBriefingScreen challenge={challenge} />;

@@ -55,7 +55,7 @@ export default function Home() {
     const pending = entries.filter((entry) => !entry.started);
 
     const mapToCard = (entry: BackendChallenge, status: "live" | "pending"): Challenge => ({
-      id: entry.metadataHash ?? String(entry.challengeId),
+      id: String(entry.challengeId),
       brandName: entry.name,
       brandInitials: getInitials(entry.name),
       brandLogoPath: entry.logoPath,
