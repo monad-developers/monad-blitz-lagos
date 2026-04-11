@@ -1,0 +1,3 @@
+[submodule "paylink/contracts/lib/forge-std"]
+	path = paylink/contracts/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
