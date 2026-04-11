@@ -15,7 +15,7 @@ function normalizePrivateKey(privateKey?: string) {
 }
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.28",
+  solidity: "0.8.24",
   networks: {
     hardhat: {},
     monad: {
