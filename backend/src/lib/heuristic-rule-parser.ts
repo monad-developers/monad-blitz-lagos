@@ -123,6 +123,7 @@ function detectCondition(prompt: string): { conditionType: ConditionType; condit
 }
 
 function extractAmountAndToken(prompt: string) {
+  // Try: "send/pay 10 USDC" or "send/pay USDC 10" format
   const verbMatch = prompt.match(/(?:send|pay)\s+([\d.]+)\s+([a-zA-Z]{2,10})/i);
 
   if (verbMatch) {
@@ -132,12 +133,13 @@ function extractAmountAndToken(prompt: string) {
     };
   }
 
-  const genericMatch = prompt.match(/\b([\d.]+)\s+([a-zA-Z]{2,10})\b/);
+  // Try: "10 USDC" anywhere in the prompt (for more flexible parsing)
+  const amountTokenMatch = prompt.match(/(\d+(?:\.\d+)?)\s+([A-Z]{2,10})/);
 
-  if (genericMatch) {
+  if (amountTokenMatch) {
     return {
-      amount: genericMatch[1],
-      tokenSymbol: genericMatch[2].toUpperCase(),
+      amount: amountTokenMatch[1],
+      tokenSymbol: amountTokenMatch[2].toUpperCase(),
     };
   }
 

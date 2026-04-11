@@ -86,6 +86,10 @@ export async function prepareRuleTransaction(rule: PaymentRule): Promise<Prepare
     throw new Error("Add a valid recipient address before running this rule.");
   }
 
+  if (!rule.amount || rule.amount === "0" || parseFloat(rule.amount) === 0) {
+    throw new Error("Rule amount must be greater than 0. Check that the amount was correctly parsed from your prompt.");
+  }
+
   const autoPayAgentAddress = env.AUTO_PAY_AGENT_ADDRESS;
   if (!autoPayAgentAddress || !isAddress(autoPayAgentAddress)) {
     throw new Error("AutoPayAgent contract address is not configured. Set AUTO_PAY_AGENT_ADDRESS in .env");
@@ -93,6 +97,16 @@ export async function prepareRuleTransaction(rule: PaymentRule): Promise<Prepare
 
   const decimals = await getTokenDecimals(rule);
   const parsedAmount = parseUnits(rule.amount, decimals);
+  
+  console.log("Transaction Preparation Debug:", {
+    ruleName: rule.name,
+    tokenSymbol: rule.tokenSymbol,
+    tokenAddress: rule.tokenAddress,
+    amount: rule.amount,
+    decimals,
+    parsedAmountBigInt: parsedAmount.toString(),
+    recipientAddress: rule.recipientAddress,
+  });
   
   // Convert rule UUID to bytes32 by hashing it
   const ruleIdBytes32 = keccak256(toBytes(rule.id));

@@ -27,3 +27,4 @@ contracts/typechain-types
 
 shared/node_modules
 shared/dist
+extra.json
