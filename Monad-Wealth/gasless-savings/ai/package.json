@@ -1,0 +1,13 @@
+{
+  "name": "gasless-savings-ai",
+  "version": "1.0.0",
+  "description": "AI layer for gasless savings — behavioral analysis + contract interface",
+  "main": "orchestrator.js",
+  "scripts": {
+    "start": "node orchestrator.js",
+    "test":  "node -e \"require('./aiEngine').runSelfTest()\""
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  }
+}
