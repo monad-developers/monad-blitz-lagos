@@ -5,8 +5,9 @@ import {
   type PaymentRule,
   type PreparedTransaction,
 } from "@paypilot/shared";
-import { encodeFunctionData, formatUnits, isAddress, parseUnits } from "viem";
-import { erc20Abi, publicClient } from "../../lib/monad";
+import { encodeFunctionData, formatUnits, isAddress, parseUnits, toBytes, keccak256 } from "viem";
+import { autoPayAgentAbi, erc20Abi, publicClient } from "../../lib/monad";
+import { env } from "../../config/env";
 
 type PreparedExecution = {
   request: {
@@ -85,46 +86,69 @@ export async function prepareRuleTransaction(rule: PaymentRule): Promise<Prepare
     throw new Error("Add a valid recipient address before running this rule.");
   }
 
+  const autoPayAgentAddress = env.AUTO_PAY_AGENT_ADDRESS;
+  if (!autoPayAgentAddress || !isAddress(autoPayAgentAddress)) {
+    throw new Error("AutoPayAgent contract address is not configured. Set AUTO_PAY_AGENT_ADDRESS in .env");
+  }
+
   const decimals = await getTokenDecimals(rule);
   const parsedAmount = parseUnits(rule.amount, decimals);
+  
+  // Convert rule UUID to bytes32 by hashing it
+  const ruleIdBytes32 = keccak256(toBytes(rule.id));
 
+  // Native MON payment - call executeNativePayment
   if (rule.tokenSymbol.toUpperCase() === "MON" || rule.tokenAddress === ZERO_ADDRESS) {
+    const data = encodeFunctionData({
+      abi: autoPayAgentAbi,
+      functionName: "executeNativePayment",
+      args: [ruleIdBytes32, rule.recipientAddress as `0x${string}`],
+    });
+
     return {
       request: {
-        to: rule.recipientAddress as `0x${string}`,
+        to: autoPayAgentAddress as `0x${string}`,
         value: parsedAmount,
+        data,
       },
       summary: {
-        to: rule.recipientAddress as `0x${string}`,
+        to: autoPayAgentAddress as `0x${string}`,
         value: parsedAmount.toString(),
+        data,
         chainId: MONAD_TESTNET.id,
-        description: `Send ${rule.amount} MON to ${rule.recipientAddress}`,
+        description: `Send ${rule.amount} MON to ${rule.recipientAddress} via AutoPayAgent`,
       },
     };
   }
 
+  // ERC20 token payment - call executeTokenPayment
   if (!rule.tokenAddress || !isAddress(rule.tokenAddress)) {
     throw new Error(`A valid ${rule.tokenSymbol} contract address is required before this rule can run.`);
   }
 
   const data = encodeFunctionData({
-    abi: erc20Abi,
-    functionName: "transfer",
-    args: [rule.recipientAddress as `0x${string}`, parsedAmount],
+    abi: autoPayAgentAbi,
+    functionName: "executeTokenPayment",
+    args: [
+      ruleIdBytes32,
+      rule.tokenAddress as `0x${string}`,
+      rule.recipientAddress as `0x${string}`,
+      parsedAmount,
+    ],
   });
 
   return {
     request: {
-      to: rule.tokenAddress as `0x${string}`,
+      to: autoPayAgentAddress as `0x${string}`,
       value: 0n,
       data,
     },
     summary: {
-      to: rule.tokenAddress as `0x${string}`,
+      to: autoPayAgentAddress as `0x${string}`,
       value: "0",
       data,
       chainId: MONAD_TESTNET.id,
-      description: `Transfer ${rule.amount} ${rule.tokenSymbol} to ${rule.recipientAddress}`,
+      description: `Transfer ${rule.amount} ${rule.tokenSymbol} to ${rule.recipientAddress} via AutoPayAgent`,
     },
   };
 }

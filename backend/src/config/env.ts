@@ -29,6 +29,7 @@ const envSchema = z.object({
   MONAD_RPC_URL: z.string().url().default(MONAD_TESTNET.rpcUrl),
   MONAD_CHAIN_ID: z.coerce.number().default(MONAD_TESTNET.id),
   MONAD_USDC_TOKEN_ADDRESS: z.string().default(""),
+  AUTO_PAY_AGENT_ADDRESS: z.string().default(""),
   DEMO_EXECUTOR_PRIVATE_KEY: z.string().default(""),
 });
 
@@ -43,6 +44,7 @@ export const env = envSchema.parse({
   MONAD_RPC_URL: process.env.MONAD_RPC_URL,
   MONAD_CHAIN_ID: process.env.MONAD_CHAIN_ID,
   MONAD_USDC_TOKEN_ADDRESS: process.env.MONAD_USDC_TOKEN_ADDRESS,
+  AUTO_PAY_AGENT_ADDRESS: process.env.AUTO_PAY_AGENT_ADDRESS,
   DEMO_EXECUTOR_PRIVATE_KEY: process.env.DEMO_EXECUTOR_PRIVATE_KEY,
 });
 

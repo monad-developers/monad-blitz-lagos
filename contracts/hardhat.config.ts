@@ -1,6 +1,7 @@
 import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
 import "@nomicfoundation/hardhat-toolbox";
+import "@nomicfoundation/hardhat-verify";
 import type { HardhatUserConfig } from "hardhat/config";
 
 loadEnv({ path: resolve(__dirname, "../.env") });
@@ -30,6 +31,21 @@ const config: HardhatUserConfig = {
       chainId: Number(process.env.MONAD_CHAIN_ID || "10143"),
       accounts: normalizePrivateKey(process.env.MONAD_PRIVATE_KEY),
     },
+  },
+  etherscan: {
+    apiKey: {
+      monadTestnet: "monad",
+    },
+    customChains: [
+      {
+        network: "monadTestnet",
+        chainId: 10143,
+        urls: {
+          apiURL: "https://testnet-explorer.monad.xyz/api",
+          browserURL: "https://testnet-explorer.monad.xyz",
+        },
+      },
+    ],
   },
 };
 

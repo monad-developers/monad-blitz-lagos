@@ -50,6 +50,55 @@ export const erc20Abi = [
   },
 ] as const;
 
+export const autoPayAgentAbi = [
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "ruleId",
+        type: "bytes32",
+      },
+      {
+        internalType: "address payable",
+        name: "recipient",
+        type: "address",
+      },
+    ],
+    name: "executeNativePayment",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "ruleId",
+        type: "bytes32",
+      },
+      {
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "executeTokenPayment",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+] as const;
+
 function normalizePrivateKey(privateKey: string): `0x${string}` {
   return (privateKey.startsWith("0x") ? privateKey : `0x${privateKey}`) as `0x${string}`;
 }
