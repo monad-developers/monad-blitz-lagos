@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --bg:       #0b1120;
+  --card:     #111827;
+  --border:   #1f2d45;
+  --teal:     #00d4a0;
+  --gray:     #8b9ab4;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg);
+  color: #fff;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+/* Fade-up entrance animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up   { animation: fadeUp 0.5s ease both; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.12s; }
+.fade-up-3 { animation-delay: 0.20s; }
+.fade-up-4 { animation-delay: 0.28s; }
+
+/* Reusable component classes */
+.label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.label-teal { color: var(--teal); }
+
+.btn-teal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--teal);
+  color: #000;
+  font-weight: 600;
+  border-radius: 9999px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  transition: opacity 0.15s, transform 0.15s;
+  border: none;
+  cursor: pointer;
+}
+.btn-teal:hover  { opacity: 0.85; transform: translateY(-1px); }
+.btn-teal:active { transform: translateY(0); }
+.btn-teal:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 9999px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer;
+}
+.btn-ghost:hover { border-color: #3a5070; background: #ffffff08; }
+
+.input {
+  background: #0b1120;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  width: 100%;
+  font-size: 0.95rem;
+  transition: border-color 0.15s;
+}
+.input:focus { outline: none; border-color: var(--teal); }
+.input::placeholder { color: #3a5070; }
+
+/* Teal live dot pulse */
+@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.35 } }
+.dot-live {
+  width: 7px; height: 7px;
+  border-radius: 9999px;
+  background: var(--teal);
+  animation: pulse 2s ease-in-out infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}

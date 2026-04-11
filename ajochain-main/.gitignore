@@ -1,0 +1,41 @@
+# dependencies
+node_modules/
+
+# environment files — NEVER commit private keys or API keys
+.env
+.env.local
+.env.production
+.env.development
+!.env.example
+!.env.local.example
+
+# Next.js
+.next/
+out/
+build/
+
+# Foundry build artifacts
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Logs
+*.log
+reasoning.log.json
+
+# macOS
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# package manager
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+package-lock.json
