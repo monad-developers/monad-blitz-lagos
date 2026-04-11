@@ -46,6 +46,12 @@ vi.mock("@/lib/contract/service", () => ({
     const score = scores?.get(player) ?? BigInt(0);
     return { score, played: score > BigInt(0) };
   }),
+  readLeaderboardFromEvents: vi.fn(async (challengeId: bigint) => {
+    const scores = contractState.playerScores.get(Number(challengeId)) ?? new Map();
+    return [...scores.entries()]
+      .map(([address, score]) => ({ address, score: Number(score), txHash: undefined as `0x${string}` | undefined }))
+      .sort((a, b) => b.score - a.score);
+  }),
   readHasPlayed: vi.fn(async (challengeId: bigint, player: `0x${string}`) => {
     const scores = contractState.playerScores.get(Number(challengeId));
     return Boolean(scores?.has(player));
@@ -269,8 +275,10 @@ describe("Monad backend routes", () => {
         body: JSON.stringify({
           sessionId: sessionJson.sessionId,
           r1: { tappedIndex: sessionJson.rounds.r1.imageUrls.indexOf(sessionJson.brand.logoPath), timeMs: 800 },
-          r2: { choiceIndex: sessionJson.rounds.r2.choices.indexOf(sessionJson.brand.tagline) },
-          r3: { choiceIndex: sessionJson.rounds.r3.choices.indexOf(sessionJson.brand.brandFact) },
+          r2: { choiceIndex: sessionJson.rounds.r2.choices.indexOf("#00AAFF"), timeMs: 1200 },
+          r3: { choiceIndex: sessionJson.rounds.r3.choices.indexOf(sessionJson.brand.tagline), timeMs: 900 },
+          r4: { choiceIndex: sessionJson.rounds.r4.choices.indexOf(sessionJson.brand.brandFact), timeMs: 1400 },
+          r5: { choiceIndex: sessionJson.rounds.r5.choices.indexOf("Tech"), timeMs: 1100 },
         }),
       }) as never,
     );
