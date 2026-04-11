@@ -27,8 +27,7 @@ export function DashboardPage() {
         userAddress: address,
       };
       console.log("Parse Rule Payload:", payload);
-      // TODO: Call api.parseRule(payload) when backend is ready
-      return Promise.reject(new Error("Parse rule not yet implemented"));
+      return api.parseRule(payload);
     },
     onSuccess: (response) => {
       setPreviewRule(response.rule);
@@ -136,29 +135,40 @@ export function DashboardPage() {
         return;
       }
 
+      setRunStates((current) => ({
+        ...current,
+        [rule.id]: {
+          status: "running",
+          message: "Waiting for wallet signature...",
+        },
+      }));
+
       const txHash = await walletClient.sendTransaction({
-        account: address,
-        chain: monadTestnet,
-        to: prepared.transaction.to,
-        value: BigInt(prepared.transaction.value),
-        data: prepared.transaction.data,
+        to: prepared.transaction.to as `0x${string}`,
+        value: prepared.transaction.value ? BigInt(prepared.transaction.value) : 0n,
+        data: prepared.transaction.data as `0x${string}` | undefined,
       });
+
+      console.log("Transaction submitted:", txHash);
 
       setRunStates((current) => ({
         ...current,
         [rule.id]: {
           status: "success",
-          message: prepared.reason || "Transaction submitted from your wallet.",
+          message: `Transaction submitted! Hash: ${txHash}`,
           txHash,
           result: prepared,
         },
       }));
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Transaction submission failed.";
+      console.error("Transaction error:", error);
+      
       setRunStates((current) => ({
         ...current,
         [rule.id]: {
           status: "error",
-          message: error instanceof Error ? error.message : "Transaction submission failed.",
+          message: errorMessage,
         },
       }));
     }
