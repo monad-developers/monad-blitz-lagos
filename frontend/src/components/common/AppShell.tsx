@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import mark from "../../assets/paypilot-mark.svg";
 
 type AppShellProps = {
@@ -8,6 +9,32 @@ type AppShellProps = {
   children: ReactNode;
   actions?: ReactNode;
 };
+
+function ConnectButton() {
+  const { address, isConnected } = useAccount();
+  const { connectors, connectAsync } = useConnect();
+  const { disconnect } = useDisconnect();
+
+  if (isConnected && address) {
+    return (
+      <div className="connect-button-group">
+        <span className="wallet-address">{address.slice(0, 6)}...{address.slice(-4)}</span>
+        <button className="connect-btn disconnect" onClick={() => disconnect()}>
+          Disconnect
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      className="connect-btn"
+      onClick={() => connectAsync({ connector: connectors[0] })}
+    >
+      Connect Wallet
+    </button>
+  );
+}
 
 export function AppShell({ title, subtitle, children, actions }: AppShellProps) {
   return (
@@ -30,6 +57,10 @@ export function AppShell({ title, subtitle, children, actions }: AppShellProps) 
             Dashboard
           </NavLink>
         </nav>
+
+        <div className="topbar-right">
+          <ConnectButton />
+        </div>
       </header>
 
       <main className="page">

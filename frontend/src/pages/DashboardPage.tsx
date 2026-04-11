@@ -7,31 +7,40 @@ import { AppShell } from "../components/common/AppShell";
 import { CreateRuleForm } from "../components/forms/CreateRuleForm";
 import { RuleList } from "../components/rules/RuleList";
 import { RulePreviewCard } from "../components/rules/RulePreviewCard";
-import { WalletPanel } from "../components/wallet/WalletPanel";
 import { useRules } from "../hooks/useRules";
 import { monadTestnet } from "../lib/wagmi";
 import { api } from "../services/api";
 import type { RuleRunState } from "../types/ui";
 
 export function DashboardPage() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { rulesQuery, saveRuleMutation, activateRuleMutation } = useRules();
   const [previewRule, setPreviewRule] = useState<ParsedRuleDraft | null>(null);
+  const [parseError, setParseError] = useState<string | null>(null);
   const [runStates, setRunStates] = useState<Record<string, RuleRunState>>({});
 
   const parseRuleMutation = useMutation({
-    mutationFn: (prompt: string) =>
-      api.parseRule({
+    mutationFn: (prompt: string) => {
+      const payload = {
         prompt,
         userAddress: address,
-      }),
+      };
+      console.log("Parse Rule Payload:", payload);
+      // TODO: Call api.parseRule(payload) when backend is ready
+      return Promise.reject(new Error("Parse rule not yet implemented"));
+    },
     onSuccess: (response) => {
       setPreviewRule(response.rule);
+      setParseError(null);
+    },
+    onError: (error) => {
+      setParseError(error instanceof Error ? error.message : "Failed to parse rule");
     },
   });
 
   async function handleParse(prompt: string) {
+    setParseError(null);
     await parseRuleMutation.mutateAsync(prompt);
   }
 
@@ -47,6 +56,7 @@ export function DashboardPage() {
 
     await saveRuleMutation.mutateAsync(ruleToSave);
     setPreviewRule(null);
+    setParseError(null);
   }
 
   async function handleActivate(ruleId: string) {
@@ -159,12 +169,19 @@ export function DashboardPage() {
       title="Build, review, and run payment rules"
       subtitle="The backend parses the prompt, the dashboard stores the rule, and the wallet signs the final transaction when you choose to run it."
     >
-      <WalletPanel />
       <CreateRuleForm
-        walletAddress={address}
         isParsing={parseRuleMutation.isPending}
+        isConnected={isConnected}
         onParse={handleParse}
       />
+
+      {parseError ? (
+        <article className="panel" style={{ background: "rgba(255, 125, 112, 0.12)", borderColor: "rgba(255, 125, 112, 0.2)" }}>
+          <p style={{ color: "var(--danger)", marginTop: 0 }}>
+            <strong>Error parsing rule:</strong> {parseError}
+          </p>
+        </article>
+      ) : null}
 
       {previewRule ? (
         <RulePreviewCard
@@ -176,6 +193,8 @@ export function DashboardPage() {
 
       <RuleList
         rules={rulesQuery.data?.rules ?? []}
+        userAddress={address}
+        isConnected={isConnected}
         pendingRuleId={
           activateRuleMutation.isPending && activateRuleMutation.variables
             ? activateRuleMutation.variables
