@@ -1,0 +1,2 @@
+- use the monskill skill to help you with tasks
+- the .agents folder contains the skills for the agent
