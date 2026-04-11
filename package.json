@@ -1,0 +1,21 @@
+{
+  "name": "paypilot",
+  "private": true,
+  "version": "0.1.0",
+  "description": "PayPilot hackathon MVP scaffold for Monad testnet",
+  "scripts": {
+    "install:shared": "npm install --prefix shared",
+    "install:backend": "npm install --prefix backend",
+    "install:frontend": "npm install --prefix frontend",
+    "install:contracts": "npm install --prefix contracts",
+    "install:all": "npm run install:shared && npm run install:backend && npm run install:frontend && npm run install:contracts",
+    "build:shared": "npm run build --prefix shared",
+    "dev:backend": "npm run build:shared && npm run dev --prefix backend",
+    "dev:frontend": "npm run build:shared && npm run dev --prefix frontend",
+    "build:backend": "npm run build:shared && npm run build --prefix backend",
+    "build:frontend": "npm run build:shared && npm run build --prefix frontend",
+    "build:contracts": "npm run build --prefix contracts",
+    "build": "npm run build:shared && npm run build:backend && npm run build:frontend && npm run build:contracts",
+    "test:contracts": "npm run test --prefix contracts"
+  }
+}

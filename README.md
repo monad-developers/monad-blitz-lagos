@@ -1,15 +1,134 @@
-# Monad Blitz Lagos Submission Process
+# PayPilot
 
-## Steps to prepare your project repo:
+PayPilot is a hackathon MVP for AI-assisted crypto payment automation on Monad testnet.
 
-1. Visit the `monad-blitz-lagos` repo (link [here](https://github.com/monad-developers/monad-blitz-lagos)) and fork it.
+The user connects a wallet, writes a natural-language payment rule, previews the parsed JSON, saves the rule, and then simulates or manually executes it. The backend keeps the rule logic and condition checks off-chain for speed, while the frontend wallet signs the final transaction for semi-automatic safety.
 
-![1.png](/screenshots/1.png)
+## Stack
 
-2. Give it your project name, a one-liner description, make sure you are forking `main` branch and click `Create Fork`
+- Frontend: React, Vite, TypeScript, wagmi, viem
+- Backend: Node.js, TypeScript, Hono, Zod, SQLite, Drizzle
+- Contracts: Solidity, Hardhat
+- Shared: reusable types, Zod schemas, constants
 
-![2.png](https://github.com/monad-developers/monad-blitz-denver/blob/main/screenshots/2.png?raw=true)
+## Monad defaults
 
-3. In your fork you can make all the changes you want, add code of your project, create branches, add information to `README.md` , you can change anything and everything.
+- Network: Monad Testnet
+- RPC URL: `https://testnet-rpc.monad.xyz`
+- Chain ID: `10143`
 
-4. For next steps head to [Blitz Portal](https://blitz.devnads.com)
+## Repository layout
+
+```txt
+paypilot/
+├── frontend/
+├── backend/
+├── contracts/
+├── shared/
+├── docs/
+├── .env.example
+├── .gitignore
+├── README.md
+└── package.json
+```
+
+The full scaffold tree is documented in [docs/folder-structure.md](/Users/mac/Desktop/hackathons/monad_blitz/pay-pilot/docs/folder-structure.md).
+
+## Quick start
+
+1. Copy the env template.
+
+```bash
+cp .env.example .env
+```
+
+2. Install dependencies for every project.
+
+```bash
+npm run install:all
+```
+
+3. Start the backend.
+
+```bash
+npm run dev:backend
+```
+
+4. In another terminal, start the frontend.
+
+```bash
+npm run dev:frontend
+```
+
+5. Run the contract tests when you want to validate the on-chain demo layer.
+
+```bash
+npm run test:contracts
+```
+
+## Root helper scripts
+
+- `npm run install:shared`
+- `npm run install:backend`
+- `npm run install:frontend`
+- `npm run install:contracts`
+- `npm run install:all`
+- `npm run dev:backend`
+- `npm run dev:frontend`
+- `npm run build`
+- `npm run test:contracts`
+
+## Backend API
+
+- `GET /health`
+- `POST /ai/parse-rule`
+- `POST /rules`
+- `GET /rules`
+- `GET /rules/:id`
+- `POST /rules/:id/activate`
+- `POST /rules/:id/run`
+
+### Parse flow
+
+- If `OPENAI_API_KEY` is available, the backend asks OpenAI for strict JSON output.
+- If no key is configured or the AI request fails, the parser falls back to a deterministic heuristic parser so the demo still works.
+
+### Run flow
+
+- `simulate`: checks conditions and returns a prepared transaction summary without sending anything
+- `prepare`: checks conditions and returns the exact transaction payload the frontend wallet should sign
+- `execute`: optionally broadcasts from the backend only when `DEMO_EXECUTOR_PRIVATE_KEY` is set
+
+## Frontend flow
+
+- Connect wallet
+- Enter a natural-language rule
+- Parse it through the backend
+- Review the preview card
+- Save the rule
+- Activate it
+- Simulate or run it from the browser wallet
+
+## Contracts
+
+The contract layer is intentionally minimal:
+
+- `AutoPayAgent.sol` handles native and ERC-20 payment execution for demo use
+- `MockUSDC.sol` provides a mintable 6-decimal token for testing
+
+Useful commands:
+
+```bash
+cd contracts
+npm run build
+npm run test
+npm run deploy
+npm run demo
+```
+
+## Notes
+
+- This MVP skips authentication to reduce setup time.
+- SQLite is stored under `backend/data/`.
+- Rules are stored off-chain and only transaction execution touches the chain.
+- For USDC rules, set `MONAD_USDC_TOKEN_ADDRESS` once you know the Monad testnet token address you want to demo with.
