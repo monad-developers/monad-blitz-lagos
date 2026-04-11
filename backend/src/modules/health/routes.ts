@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { MONAD_TESTNET } from "@paypilot/shared";
+import { MONAD_TESTNET } from "../../shared";
 
 export const healthRoutes = new Hono().get("/", (c) =>
   c.json({

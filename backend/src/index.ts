@@ -1,5 +1,5 @@
 import { serve } from "@hono/node-server";
-import { MONAD_TESTNET } from "@paypilot/shared";
+import { MONAD_TESTNET } from "./shared";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -8,6 +8,7 @@ import { initDb } from "./db/init";
 import { handleApiError } from "./middleware/error-handler";
 import { checkOpenAIConfiguration } from "./modules/ai/ai.service";
 import { aiRoutes } from "./modules/ai/routes";
+import { docsRoutes } from "./modules/docs/routes";
 import { healthRoutes } from "./modules/health/routes";
 import { rulesRoutes } from "./modules/rules/routes";
 
@@ -37,6 +38,8 @@ async function startServer() {
       network: MONAD_TESTNET.name,
       endpoints: [
         "GET /health",
+        "GET /docs",
+        "GET /docs/openapi.json",
         "POST /ai/parse-rule",
         "POST /rules",
         "GET /rules",
@@ -48,6 +51,7 @@ async function startServer() {
   );
 
   app.route("/health", healthRoutes);
+  app.route("/docs", docsRoutes);
   app.route("/ai", aiRoutes);
   app.route("/rules", rulesRoutes);
 

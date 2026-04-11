@@ -4,7 +4,7 @@ import {
   ZERO_ADDRESS,
   type PaymentRule,
   type PreparedTransaction,
-} from "@paypilot/shared";
+} from "../../shared";
 import { encodeFunctionData, formatUnits, isAddress, parseUnits, toBytes, keccak256 } from "viem";
 import { autoPayAgentAbi, erc20Abi, publicClient } from "../../lib/monad";
 import { env } from "../../config/env";

@@ -7,7 +7,7 @@ import {
   type RuleStatus,
   type RunMode,
   type RunRuleResponse,
-} from "@paypilot/shared";
+} from "../../shared";
 import { desc, eq } from "drizzle-orm";
 import { db } from "../../db/client";
 import { executionsTable, rulesTable, type ExecutionRow, type RuleRow } from "../../db/schema";

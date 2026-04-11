@@ -1,4 +1,4 @@
-import type { PaymentRule } from "@paypilot/shared";
+import type { PaymentRule } from "../../shared";
 import { isAddress } from "viem";
 import { getRuleBalance } from "../payments/payments.service";
 

@@ -3,16 +3,19 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts --format esm --out-dir dist --clean",
+    "generate:openapi": "node --import tsx scripts/generate-openapi.ts",
+    "build": "npm run generate:openapi && tsup src/index.ts --format esm --out-dir dist --clean",
     "start": "node dist/index.js",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",
-    "@paypilot/shared": "file:../shared",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.36.4",
     "hono": "^4.6.10",

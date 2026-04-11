@@ -1,24 +1,25 @@
 import { config as loadEnv } from "dotenv";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { z } from "zod";
-import { MONAD_TESTNET } from "@paypilot/shared";
+import { MONAD_TESTNET } from "../shared";
 
-const currentDir = dirname(fileURLToPath(import.meta.url));
-const backendRoot = resolve(currentDir, "../..");
+const backendRoot = resolve(process.cwd());
 
 loadEnv({ path: resolve(backendRoot, "../.env") });
 loadEnv({ path: resolve(backendRoot, ".env"), override: true });
-const defaultDatabaseUrl =
-  "postgresql://postgres:postgres@localhost:5432/paypilot?schema=public";
+
+const runtimeNodeEnv = process.env.NODE_ENV ?? "development";
+const isProduction = runtimeNodeEnv === "production";
+
+const defaultDatabaseUrl = "postgresql://paypilot:paypilot@localhost:5432/paypilot";
 
 const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
   PORT: z.coerce.number().default(8787),
-  FRONTEND_ORIGIN: z.string().default("http://localhost:5173"),
-  DATABASE_URL: z.string().url().default(defaultDatabaseUrl),
+  FRONTEND_ORIGIN: isProduction ? z.string().min(1) : z.string().default("http://localhost:5173"),
+  DATABASE_URL: isProduction ? z.string().url() : z.string().url().default(defaultDatabaseUrl),
   OPENAI_API_KEY: z.string().default(""),
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_MODEL: z.string().default("gpt-4o-mini"),

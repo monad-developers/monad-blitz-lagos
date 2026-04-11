@@ -1,4 +1,4 @@
-import type { ParseRuleResponse } from "@paypilot/shared";
+import type { ParseRuleResponse } from "../../shared";
 import { z } from "zod";
 import { env } from "../../config/env";
 import {
@@ -89,8 +89,6 @@ export async function checkOpenAIConfiguration() {
       },
       signal: AbortSignal.timeout(5_000),
     });
-
-    console.dir(response);
 
     if (!response.ok) {
       const errorText = summarizeOpenAIError(await response.text());

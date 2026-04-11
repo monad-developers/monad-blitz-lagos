@@ -1,4 +1,4 @@
-import { MONAD_TESTNET } from "@paypilot/shared";
+import { MONAD_TESTNET } from "../shared";
 import { createPublicClient, createWalletClient, defineChain, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { env } from "../config/env";

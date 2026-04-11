@@ -91,6 +91,8 @@ npm run test:contracts
 ## Backend API
 
 - `GET /health`
+- `GET /docs`
+- `GET /docs/openapi.json`
 - `POST /ai/parse-rule`
 - `POST /rules`
 - `GET /rules`

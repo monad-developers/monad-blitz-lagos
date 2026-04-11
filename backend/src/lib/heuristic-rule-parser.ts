@@ -7,7 +7,7 @@ import {
   type ParsedRuleDraft,
   type ParsingSource,
   type ScheduleType,
-} from "@paypilot/shared";
+} from "../shared";
 import { isAddress } from "viem";
 import { env } from "../config/env";
 

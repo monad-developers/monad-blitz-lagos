@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { paymentRuleSchema, runModeSchema } from "@paypilot/shared";
+import { paymentRuleSchema, runModeSchema } from "../../shared";
 import { z } from "zod";
 import {
   getRuleById,
