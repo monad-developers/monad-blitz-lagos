@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   font-family: "Space Grotesk", "Avenir Next", sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -9,20 +9,21 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --bg: #07131a;
-  --bg-elevated: rgba(8, 20, 27, 0.8);
-  --card: rgba(14, 29, 37, 0.82);
-  --card-strong: rgba(18, 35, 46, 0.95);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 213, 106, 0.25);
-  --text: #eef9f5;
-  --muted: #93b2b6;
-  --accent: #21d19f;
-  --accent-strong: #19f0b1;
-  --warning: #ffd56a;
-  --danger: #ff7d70;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-  --radius: 28px;
+  /* White and Purple Theme */
+  --bg: #ffffff;
+  --bg-elevated: #f8f5ff;
+  --card: #f5f0ff;
+  --card-strong: #f0ebff;
+  --line: rgba(128, 90, 213, 0.12);
+  --line-strong: rgba(128, 90, 213, 0.25);
+  --text: #1a1a1a;
+  --muted: #666666;
+  --accent: #8b5ad5;
+  --accent-strong: #a367e0;
+  --warning: #ffa500;
+  --danger: #ff4444;
+  --shadow: 0 8px 32px rgba(139, 90, 213, 0.12);
+  --radius: 12px;
 }
 
 * {
@@ -34,9 +35,9 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(33, 209, 159, 0.2), transparent 32%),
-    radial-gradient(circle at top right, rgba(255, 213, 106, 0.16), transparent 24%),
-    linear-gradient(180deg, #091219 0%, #060d12 100%);
+    radial-gradient(circle at top left, rgba(139, 90, 213, 0.1), transparent 40%),
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.05), transparent 40%),
+    linear-gradient(180deg, #ffffff 0%, #f8f5ff 100%);
   color: var(--text);
 }
 
@@ -84,9 +85,10 @@ code {
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 2rem;
-  background: rgba(6, 13, 18, 0.72);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(139, 90, 213, 0.08);
 }
 
 .brand {
@@ -265,11 +267,16 @@ code {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: rgba(7, 19, 26, 0.92);
+  background: var(--bg-elevated);
   color: var(--text);
   padding: 1rem 1.05rem;
   resize: vertical;
   min-height: 132px;
+}
+
+.field textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
 }
 
 .field textarea:focus {
@@ -431,7 +438,59 @@ code {
   border: 1px solid rgba(255, 125, 112, 0.2);
 }
 
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.connect-btn {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.connect-btn:hover {
+  background: var(--card-strong);
+  border-color: var(--line-strong);
+}
+
+.connect-btn.disconnect {
+  background: rgba(255, 125, 112, 0.12);
+  border-color: rgba(255, 125, 112, 0.2);
+}
+
+.connect-btn.disconnect:hover {
+  background: rgba(255, 125, 112, 0.20);
+  border-color: rgba(255, 125, 112, 0.3);
+}
+
+.connect-button-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wallet-address {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9rem;
+  color: var(--muted);
+  padding: 0 0.5rem;
+}
+
 @media (max-width: 860px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
   .topbar,
   .hero-card,
   .panel-header,
@@ -448,5 +507,10 @@ code {
 
   .topnav {
     width: 100%;
+  }
+
+  .topbar-right {
+    width: 100%;
+    justify-content: flex-end;
   }
 }

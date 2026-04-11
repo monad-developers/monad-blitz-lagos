@@ -3,6 +3,8 @@ import type { RuleRunState } from "../../types/ui";
 
 type RuleListProps = {
   rules: PaymentRule[];
+  userAddress?: string;
+  isConnected: boolean;
   pendingRuleId?: string;
   runStates: Record<string, RuleRunState>;
   onActivate: (ruleId: string) => Promise<void>;
@@ -16,12 +18,17 @@ function statusLabel(rule: PaymentRule) {
 
 export function RuleList({
   rules,
+  userAddress,
+  isConnected,
   pendingRuleId,
   runStates,
   onActivate,
   onSimulate,
   onRun,
 }: RuleListProps) {
+  // Filter rules by connected wallet address
+  const filteredRules = userAddress ? rules.filter((rule) => rule.userAddress === userAddress) : rules;
+
   return (
     <article className="panel">
       <div className="panel-header">
@@ -29,18 +36,23 @@ export function RuleList({
           <p className="eyebrow">Rule List</p>
           <h2>Saved payment automations</h2>
         </div>
-        <span className="badge badge-muted">{rules.length} total</span>
+        <span className="badge badge-muted">{filteredRules.length} total</span>
       </div>
 
-      <div className="rule-list">
-        {rules.length === 0 ? (
-          <div className="empty-state">
-            <h3>No rules yet</h3>
-            <p>Parse and save your first prompt to start testing flows on Monad testnet.</p>
-          </div>
-        ) : null}
+      {!isConnected ? (
+        <div className="empty-state">
+          <h3>Connect your wallet</h3>
+          <p>Connect a Monad-compatible wallet to view and manage your payment rules.</p>
+        </div>
+      ) : filteredRules.length === 0 ? (
+        <div className="empty-state">
+          <h3>No rules yet</h3>
+          <p>Parse and save your first prompt to start testing flows on Monad testnet.</p>
+        </div>
+      ) : null}
 
-        {rules.map((rule) => {
+      <div className="rule-list">
+        {filteredRules.map((rule) => {
           const runState = runStates[rule.id];
 
           return (

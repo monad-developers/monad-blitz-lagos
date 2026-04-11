@@ -15,38 +15,23 @@ function normalizePrivateKey(privateKey?: string) {
 }
 
 const config: HardhatUserConfig = {
-  solidity: {
-    version: "0.8.24",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
-      },
-    },
-  },
+  solidity: "0.8.24",
   networks: {
     hardhat: {},
-    monadTestnet: {
+    monad: {
       url: process.env.MONAD_RPC_URL || "https://testnet-rpc.monad.xyz",
       chainId: Number(process.env.MONAD_CHAIN_ID || "10143"),
       accounts: normalizePrivateKey(process.env.MONAD_PRIVATE_KEY),
     },
   },
-  etherscan: {
-    apiKey: {
-      monadTestnet: "monad",
-    },
-    customChains: [
-      {
-        network: "monadTestnet",
-        chainId: 10143,
-        urls: {
-          apiURL: "https://testnet-explorer.monad.xyz/api",
-          browserURL: "https://testnet-explorer.monad.xyz",
-        },
-      },
-    ],
+  sourcify: {
+    enabled: true,
+    apiUrl: "https://sourcify-api-monad.blockvision.org/",
+    browserUrl: "https://testnet.monadvision.com/"
   },
+  etherscan: {
+    enabled: false
+  }
 };
 
 export default config;
