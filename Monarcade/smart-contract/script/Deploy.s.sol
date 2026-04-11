@@ -9,7 +9,6 @@ contract Deploy is Script {
         address serverSigner = vm.envAddress("SERVER_SIGNER_ADDRESS");
 
         vm.startBroadcast();
-        // 5% platform fee = 500 basis points
         Monarchade mm = new Monarchade(serverSigner, 500); 
         console.log("Monarchade deployed at:", address(mm));
         console.log("Server signer:", serverSigner);

@@ -116,7 +116,9 @@ createChallenge (brand deposits MON, fee deducted)
        │
        └──▶ refundBrand (if 0 submissions, after 48h delay)
 ```
-== Logs ==
-  Monarchade deployed at: 0x10a8AcA2738d1C59Ccbaa234350807d206D42990
-  Server signer: 0xb566ae57c560B77bF987ECcE59f0BE774B7F2B15
-  Chain ID: 10143
+### Logs
+
+-  Monarchade deployed at: 0x10a8AcA2738d1C59Ccbaa234350807d206D42990
+-  Server signer: 0xb566ae57c560B77bF987ECcE59f0BE774B7F2B15
+-  Chain ID: 10143
+-  Smart Contract Deployed on [MONAD TESTNET](https://testnet.monadvision.com/address/0x10a8AcA2738d1C59Ccbaa234350807d206D42990?tab=Contract)
