@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-secondary: #8e4c41;
+  --color-tertiary: #006b5b;
+  --color-on-error: #ffffff;
+  --color-on-background: #211a14;
+  --color-surface-tint: #ac3323;
+  --color-error: #ba1a1a;
+  --color-surface-container: #faebe1;
+  --color-on-tertiary-container: #003b32;
+  --color-on-tertiary-fixed-variant: #005144;
+  --color-surface-container-highest: #eee0d6;
+  --color-tertiary-fixed-dim: #53dcc1;
+  --color-error-container: #ffdad6;
+  --color-tertiary-fixed: #73f9dc;
+  --color-on-tertiary-fixed: #00201a;
+  --color-primary-container: #ff6f59;
+  --color-on-surface: #211a14;
+  --color-surface-container-high: #f4e5dc;
+  --color-surface-container-low: #fff1e8;
+  --color-on-surface-variant: #58413d;
+  --color-primary: #ac3323;
+  --color-on-primary-fixed-variant: #8a1a0e;
+  --color-outline: #8c716c;
+  --color-on-secondary-fixed-variant: #71352b;
+  --color-surface-dim: #e6d7ce;
+  --color-on-error-container: #93000a;
+  --color-surface-bright: #fff8f5;
+  --color-surface-variant: #eee0d6;
+  --color-secondary-fixed-dim: #ffb4a7;
+  --color-on-primary-fixed: #400100;
+  --color-primary-fixed: #ffdad4;
+  --color-surface: #fff8f5;
+  --color-on-tertiary: #ffffff;
+  --color-on-primary: #ffffff;
+  --color-inverse-on-surface: #fdeee4;
+  --color-tertiary-container: #00b097;
+  --color-surface-container-lowest: #ffffff;
+  --color-secondary-fixed: #ffdad4;
+  --color-outline-variant: #e0bfba;
+  --color-inverse-primary: #ffb4a7;
+  --color-background: #fff8f5;
+  --color-primary-fixed-dim: #ffb4a7;
+  --color-secondary-container: #fda99a;
+  --color-on-primary-container: #6e0400;
+  --color-inverse-surface: #372f28;
+  --color-on-secondary-fixed: #390b05;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #793b31;
+
+  --font-newsreader: "Newsreader", serif;
+  --font-inter: "Inter", sans-serif;
+  --font-headline: var(--font-newsreader);
+  --font-body: var(--font-inter);
+  --font-label: var(--font-inter);
+}
+
+@layer base {
+  body {
+    @apply font-body bg-background text-on-background;
+  }
+}
+
+@layer utilities {
+  .radial-glow {
+    background: radial-gradient(circle at center, rgba(255, 111, 89, 0.08) 0%, transparent 70%);
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}
+
+::selection {
+  @apply bg-primary-container text-on-primary-container;
+}
