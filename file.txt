@@ -1,0 +1,60 @@
+# The folder structure
+
+```
+paylink/
+├── Guide.md                          ← you are here
+├── .gitignore
+├── README.md
+│
+├── contracts/                        ← P1 owns everything here
+│   ├── foundry.toml
+│   ├── .env                          ← PRIVATE_KEY (never commit)
+│   ├── src/
+│   │   └── PaymentLink.sol
+│   ├── test/
+│   │   └── PaymentLink.t.sol
+│   └── script/
+│       └── Deploy.s.sol
+│
+└── frontend/                         ← P2 and P3 share this
+    ├── .env.local                    ← Privy + contract address (never commit)
+    ├── next.config.mjs
+    ├── tailwind.config.ts
+    ├── tsconfig.json
+    │
+    ├── app/
+    │   ├── layout.tsx                ← P2
+    │   ├── page.tsx                  ← P2  (create link)
+    │   ├── pay/
+    │   │   └── [linkId]/
+    │   │       └── page.tsx          ← P2  (payment page)
+    │   └── history/
+    │       └── page.tsx              ← P2  (history page)
+    │
+    ├── components/
+    │   ├── Navbar.tsx                ← P3
+    │   ├── ui/
+    │   │   ├── Button.tsx            ← P3
+    │   │   ├── Card.tsx              ← P3
+    │   │   ├── Skeleton.tsx          ← P3
+    │   │   └── Toast.tsx             ← P3
+    │   └── payment/
+    │       ├── PaymentCard.tsx       ← P3
+    │       ├── ReceiptCard.tsx       ← P3
+    │       └── HistoryItem.tsx       ← P3
+    │
+    ├── lib/
+    │   ├── wagmi.ts                  ← P2  (chain config)
+    │   ├── contract.ts               ← P2  (ABI + address — filled by P1 on Day 2)
+    │   └── utils.ts                  ← P2  (shared helpers — everyone imports from here)
+    │
+    ├── hooks/
+    │   ├── usePaymentLink.ts         ← P2  (contract call logic)
+    │   └── useToast.ts               ← P3  (global toast state)
+    │
+    ├── providers/
+    │   └── PrivyProvider.tsx         ← P2
+    │
+    └── styles/
+        └── globals.css               ← P3
+```
