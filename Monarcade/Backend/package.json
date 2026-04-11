@@ -1,26 +1,29 @@
 {
-  "name": "my-app",
+  "name": "backend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:ci": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "next": "16.2.3",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "@privy-io/node": "^0.12.0",
+    "next": "16.2.2",
+    "viem": "^2.23.5",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
-    "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.3",
-    "tailwindcss": "^4",
+    "eslint-config-next": "16.2.2",
+    "vitest": "^3.2.4",
     "typescript": "^5"
   }
 }
