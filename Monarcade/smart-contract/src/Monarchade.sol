@@ -90,6 +90,25 @@ contract Monarchade {
         emit ChallengeStarted(challengeId, c.startTime, c.endTime);
     }
 
+    function refundBrand(uint256 challengeId) external challengeExists(challengeId) {
+        Challenge storage c = challenges[challengeId];
+        require(msg.sender == c.brand, "Not the challenge brand");
+        require(!c.distributed, "Already distributed");
+        require(c.scoreCount == 0, "Challenge has submissions");
+
+        if (c.started) {
+            require(block.timestamp > c.endTime + SUBMIT_GRACE + REFUND_DELAY, "Refund delay not passed");
+        }
+
+        uint256 amount = c.prizePool;
+        totalEscrowed = totalEscrowed - amount;
+        c.prizePool = 0;
+        c.distributed = true;
+        (bool ok, ) = c.brand.call{value: amount}("");
+        require(ok, "Refund transfer failed");
+        emit ChallengeRefunded(challengeId, c.brand, amount);
+    }
+
     function submitScore(
         uint256 challengeId, address player, uint256 score
     ) external onlyServerSigner challengeExists(challengeId) {
@@ -108,6 +127,37 @@ contract Monarchade {
         emit ScoreSubmitted(challengeId, player, score, c.scoreCount);
     }
 
+    function distributeRewards(
+        uint256 challengeId, address[] calldata winners, uint256[] calldata amounts
+    ) external onlyServerSigner challengeExists(challengeId) {
+        Challenge storage c = challenges[challengeId];
+        require(c.started, "Challenge not started");
+        require(block.timestamp > c.endTime + SUBMIT_GRACE, "Submission window not closed");
+        require(!c.distributed, "Already distributed");
+        require(winners.length > 0, "No winners provided");
+        require(winners.length == amounts.length, "Array length mismatch");
+        require(winners.length <= c.winnerCount, "Exceeds winner count");
+        require(c.scoreCount > 0, "No submissions");
+
+        uint256 total = 0;
+        for (uint256 i = 0; i < amounts.length; i++) {
+            require(winners[i] != address(0), "Zero winner address");
+            require(hasPlayed[challengeId][winners[i]], "Winner did not play");
+            require(amounts[i] > 0, "Zero amount for winner");
+            total += amounts[i];
+        }
+        require(total == c.prizePool, "Amounts do not match prize pool");
+
+        c.distributed = true;
+        totalEscrowed = totalEscrowed - c.prizePool;
+        c.prizePool = 0;
+        for (uint256 i = 0; i < winners.length; i++) {
+            (bool ok, ) = winners[i].call{value: amounts[i]}("");
+            require(ok, "Prize transfer failed");
+        }
+        emit RewardsDistributed(challengeId, winners, amounts);
+    }
+
     function getChallenge(uint256 challengeId) external view returns (Challenge memory) {
         return challenges[challengeId];
     }
@@ -122,8 +172,6 @@ contract Monarchade {
         Challenge storage c = challenges[challengeId];
         return c.started && block.timestamp >= c.startTime && block.timestamp <= c.endTime;
     }
-
-
 
     function updateServerSigner(address newSigner) external onlyOwner {
         require(newSigner != address(0), "Zero address");
