@@ -1,13 +1,15 @@
 "use client"
 
+import { baseChain } from "@/lib/wallet/wagmi"
 import { useMemo } from "react"
 import { erc20Abi, formatUnits, zeroAddress } from "viem"
 import { useBalance, useReadContracts } from "wagmi"
 
 export const useWalletBalances = (address?: `0x${string}`) => {
   const { data: nativeBalance } = useBalance({
-    address
+    chainId: baseChain.id
   })
+  console.log({ nativeBalance });
 
   const { data } = useReadContracts({
     contracts: [

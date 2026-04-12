@@ -33,7 +33,7 @@ export const monadTestnet = {
   },
 } as const
 
-export const kite = {
+export const monad = {
   id: 143,
   name: "Monad Mainnet",
   network: "Monad Mainnet",
@@ -57,7 +57,7 @@ export const kite = {
 
 export function getConfig() {
   return createConfig({
-    chains: [monadTestnet, kite],
+    chains: [monadTestnet, monad],
     storage: createStorage({
       storage: cookieStorage,
     }),
@@ -65,10 +65,13 @@ export function getConfig() {
     connectors: [injected()],
     transports: {
       [monadTestnet.id]: http(),
-      [kite.id]: http(),
+      [monad.id]: http(),
     },
   })
 }
+
+export const baseChain = process.env.NEXT_PUBLIC_BASE_CHAIN_ENV === "testnet" ? monadTestnet : monad
+export const defaultRpc = process.env.NEXT_PUBLIC_BASE_CHAIN_ENV === "testnet" ? monadTestnet.rpcUrls.default.http[0] : monad.rpcUrls.default.http[0]
 
 declare module "wagmi" {
   interface Register {

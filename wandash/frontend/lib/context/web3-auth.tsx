@@ -10,7 +10,6 @@ import {
   Web3AuthProvider,
   type Web3AuthContextConfig,
 } from "@web3auth/modal/react"
-import { getConfig } from "../wallet/wagmi"
 import { WagmiProvider } from "@web3auth/modal/react/wagmi"
 
 const web3AuthClientID = process.env.NEXT_PUBLIC_WEB3AUTH_ID || ""
@@ -36,7 +35,7 @@ export const web3AuthContextConfig: Web3AuthContextConfig = {
           },
         },
       },
-    },
+    }
   },
 }
 

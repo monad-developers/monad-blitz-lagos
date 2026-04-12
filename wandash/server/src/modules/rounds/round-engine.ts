@@ -14,7 +14,8 @@ import {
 
 const log = createLogger("RoundEngine")
 
-const COOLDOWN_DURATION_MS = 15_000 // 15 seconds between rounds
+const COOLDOWN_DURATION_MS = 10_000 // 10 seconds between rounds
+const MAX_EMPTY_ROUNDS = 10 // Cancel game if this many consecutive rounds have 0 winners
 
 // ─── Handler registry ───
 
@@ -28,6 +29,9 @@ const handlers: Record<MiniGameType, MiniGameHandler> = {
 // ─── In-memory game rotation queues ───
 // Key: gameId → shuffled array of remaining game types to play
 const rotationQueues = new Map<string, MiniGameType[]>()
+
+// ─── Track consecutive empty rounds per game ───
+const emptyRoundStreak = new Map<string, number>()
 
 // ─── Active round timers ───
 const roundTimers = new Map<string, NodeJS.Timeout>()
@@ -254,9 +258,22 @@ export async function endRound(gameId: string) {
   // Game completes when:
   // 1. Enough distinct winners found, OR
   // 2. Not enough remaining funds for even one more prize
+  // 3. Too many consecutive empty rounds (no players participating)
   const remainingAfterRound = totalRewardsBig - disbursed
+
+  // Track consecutive empty rounds
+  if (roundWinners.length === 0) {
+    emptyRoundStreak.set(gameId, (emptyRoundStreak.get(gameId) || 0) + 1)
+  } else {
+    emptyRoundStreak.set(gameId, 0)
+  }
+  const streak = emptyRoundStreak.get(gameId) || 0
+
   if (existingWinners.size >= game.numWinners || remainingAfterRound < prizePerWinnerBig) {
     await completeGame(gameId)
+  } else if (streak >= MAX_EMPTY_ROUNDS) {
+    log.warn("Cancelling game: too many consecutive empty rounds", { gameId, streak })
+    await cancelGame(gameId)
   } else {
     await enterCooldown(gameId)
   }
@@ -321,6 +338,7 @@ async function completeGame(gameId: string) {
     handler.cleanup(gameId)
   }
   rotationQueues.delete(gameId)
+  emptyRoundStreak.delete(gameId)
 
   // Aggregate per-address payouts from all round results.
   // Same player winning multiple rounds accumulates prizes.
@@ -383,6 +401,40 @@ async function completeGame(gameId: string) {
       cause: err?.cause?.shortMessage || err?.cause?.message,
     })
   }
+}
+
+/**
+ * Cancel a game that has been running with no participants.
+ * No on-chain finalization needed since no payouts exist.
+ */
+async function cancelGame(gameId: string) {
+  clearAllTimers(gameId)
+
+  await prisma.game.update({
+    where: { id: gameId },
+    data: {
+      status: "cancelled",
+      endTime: new Date(),
+      cooldownEndsAt: null,
+    },
+  })
+
+  // Clean up all game handler state
+  for (const handler of Object.values(handlers)) {
+    handler.cleanup(gameId)
+  }
+  rotationQueues.delete(gameId)
+  emptyRoundStreak.delete(gameId)
+
+  connectionMap.broadcastAll(gameId, {
+    type: WsMessageType.GAME_END,
+    gameId,
+    winners: [],
+    totalRounds: 0,
+    cancelled: true,
+  })
+
+  log.info("Game cancelled due to inactivity", { gameId })
 }
 
 /**

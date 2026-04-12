@@ -329,6 +329,7 @@ const GameLobby = ({
   const [countdown, setCountdown] = useState<number | null>(null)
   const [showLeaveDialog, setShowLeaveDialog] = useState(false)
 
+  console.log({ showLeaveDialog });
   // Cooldown countdown (between rounds)
   useEffect(() => {
     if (phase !== "cooldown" || !cooldownEndsAt) return
@@ -375,7 +376,7 @@ const GameLobby = ({
   }, [phase, giveaway, cooldownEndsAt])
 
   return (
-    <div className="fixed inset-0 z-60 flex flex-col items-center justify-center bg-background p-6 text-center">
+    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-background p-6 text-center">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -481,7 +482,7 @@ const GameLobby = ({
             className="relative z-50"
           >
             <DialogBackdrop
-              className="fixed inset-0 bg-black/30"
+              className="fixed inset-0 bg-background/30"
               aria-hidden="true"
             />
 
@@ -504,7 +505,7 @@ const GameLobby = ({
                   <Button
                     onClick={() => {
                       const ws = getSocket()
-                      if (ws && ws.readyState === WebSocket.OPEN) {
+                      if (ws?.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: "LEAVE_GAME" }))
                       }
                       setShowLeaveDialog(false)

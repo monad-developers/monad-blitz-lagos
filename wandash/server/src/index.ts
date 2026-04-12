@@ -9,6 +9,7 @@ import { gameRoutes } from "./modules/games";
 import { initWebSocket } from "./websocket";
 import { startGameScheduler } from "./workers";
 import { shutdownRoundEngine } from "./modules/rounds";
+import { playerRoutes } from "./modules/players/player.routes";
 
 const log = createLogger("Server");
 
@@ -35,6 +36,7 @@ app.get("/health", (_req, res) => {
 
 // REST routes
 app.use("/api/games", gameRoutes);
+app.use("/api/players", playerRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

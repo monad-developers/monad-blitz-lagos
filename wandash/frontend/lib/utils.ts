@@ -10,3 +10,6 @@ export const truncateString = (str: string, start: number = 6, end: number = 4) 
   if (str.length <= start + end) return str;
   return `${str.slice(0, start)}...${str.slice(-end)}`;
 };
+
+export const serverUrl =
+  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3001"

@@ -74,7 +74,6 @@ export const gameController = {
   async getRoundConfig(req: Request, res: Response) {
     const { id } = gameIdParam.parse(req.params);
     const game = await gameService.findById(id);
-    console.log({ game });
     if (!game) return res.status(404).json({ error: "Game not found" });
     if (game.status !== "active" || !game.currentGame) {
       return res.json({ config: null, round: game.currentRound, gameType: game.currentGame });

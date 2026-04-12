@@ -6,13 +6,16 @@ import {
   useWeb3AuthDisconnect,
   useWeb3AuthUser,
 } from "@web3auth/modal/react"
-import { useBalance } from "wagmi"
+import { useBalance, useConnection, useSwitchChain } from "wagmi"
 import { formatUnits } from "viem"
 import { LogOut } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import { Spinner } from "../ui/spinner"
 import { useUserStore } from "@/store/user-store"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { baseChain } from "@/lib/wallet/wagmi"
 
 // ─── Player Role Switcher ───────────────────────────────────
 // Safe to use Web3Auth hooks here — only rendered inside Web3AuthProvider.
@@ -20,10 +23,12 @@ import { useUserStore } from "@/store/user-store"
 export function PlayerRoleSwitcher() {
   const { setRole } = useUserStore()
   const { disconnect, loading } = useWeb3AuthDisconnect()
+  const router = useRouter()
 
   const switchToHost = async () => {
     await disconnect({ cleanup: true })
     setRole("host")
+    router.replace("/organize")
   }
 
   return (

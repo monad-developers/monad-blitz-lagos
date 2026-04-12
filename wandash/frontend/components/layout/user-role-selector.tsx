@@ -11,7 +11,7 @@ import {
   Wallet,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
@@ -57,12 +57,14 @@ function HostRoleSwitcher() {
   const { connector } = useConnection()
   const { mutate: disconnectWallet, isPending: isDisconnecting } =
     useDisconnect()
+  const router = useRouter()
 
   const switchToPlayer = () => {
     if (connector) {
       disconnectWallet({ connector })
     }
     setRole("player")
+    router.replace("/")
   }
 
   return (
