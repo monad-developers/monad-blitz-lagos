@@ -8,7 +8,7 @@ import { DisplayHostLeaderboardSample, DisplayOngoingGames, DisplayUpcomingGames
 export default function HomePage() {
   return (
     <div className="space-y-8 pb-24 md:pb-8">
-      <section className="relative overflow-hidden rounded-3xl bg-primary px-6 py-12 text-primary-foreground">
+     {false &&  <section className="relative overflow-hidden rounded-3xl bg-primary px-6 py-12 text-primary-foreground">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
         <div className="relative z-10 max-w-2xl space-y-4">
           <Badge className="border-none bg-white/20 text-white">
@@ -38,7 +38,7 @@ export default function HomePage() {
             </Button>
           </div>
         </div>
-      </section>
+      </section>}
 
       <section className="space-y-4 mt-5">
        <DisplayOngoingGames />

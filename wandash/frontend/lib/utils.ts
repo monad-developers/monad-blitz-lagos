@@ -13,3 +13,4 @@ export const truncateString = (str: string, start: number = 6, end: number = 4) 
 
 export const serverUrl =
   process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3001"
+export const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"

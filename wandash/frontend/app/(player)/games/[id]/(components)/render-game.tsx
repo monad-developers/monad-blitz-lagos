@@ -21,6 +21,7 @@ import { useWeb3AuthUser } from "@web3auth/modal/react"
 import { Progress } from "@/components/ui/progress"
 import { sendAnswer } from "@/lib/websocket/send-action"
 import { formatUnits } from "viem"
+import { serverUrl } from "@/lib/utils"
 
 type Props = {
   giveawayId: string
@@ -61,17 +62,14 @@ const GameScreen = ({ giveaway }: { giveaway?: IGiveaway }) => {
   const currentState = useGameStore((s) => s.currentState)
   const gameId = useGameStore((s) => s.gameId)
 
-  console.log({ round, gameType });
-
   // Fallback: fetch config via REST if WS didn't deliver it
   useEffect(() => {
     if (config || !gameId) return
     fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/games/${giveaway?.game?.id}/round-config`
+      `${serverUrl}/api/games/${giveaway?.game?.id}/round-config`
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log({ configData: data })
         if (data.config) {
           useGameStore.getState().setGame({
             config: data.config,

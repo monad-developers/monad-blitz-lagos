@@ -10,7 +10,7 @@ Wandash is built as a **Monad-first** platform — all core game logic, prize cu
 
 - **GiveawayV1 smart contract** on Monad Testnet — prize escrow, ECDSA-verified winner finalization
 - **4 mini-games**: Quiz, Tap When Green (reaction), Tap Tap Tap (speed), Dice Roll (luck)
-- **Real-time multiplayer** via WebSocket — hundreds of concurrent players per game
+- **Real-time multIGamePlayer** via WebSocket — hundreds of concurrent players per game
 - **Frictionless onboarding** — email/phone login via Web3Auth (no wallet required for players)
 - **Host tools** — create giveaways, set prize pools, choose game styles, manage profile
 - **Automated game lifecycle** — subgraph detection → lobby → rounds → cooldown → finalization

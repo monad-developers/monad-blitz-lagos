@@ -12,7 +12,7 @@ Think of it as the collision of live game shows and crypto giveaways: a host put
 
 Monad is fast. Transactions settle in seconds. Gas is cheap. That makes it the perfect chain for real-time, interactive experiences that would be impossible on slower networks.
 
-Wandash uses this speed to create a **live multiplayer gaming experience** where:
+Wandash uses this speed to create a **live multIGamePlayer gaming experience** where:
 
 - **Players earn MON** by competing in mini-games (quiz, reaction, tap challenges, dice)
 - **Hosts drive engagement** by creating giveaways that attract real users

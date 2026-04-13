@@ -13,7 +13,7 @@ export const playerService = {
     async findPlayerByWallet(wallet: string) {
         return prisma.player.findUnique({
             where: { walletAddress: wallet },
-            include: { games: { include: { game: true } } },
+            include: { games: { include: { game: false } } },
         })
     }
 }

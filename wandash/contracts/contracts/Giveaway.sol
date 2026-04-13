@@ -57,7 +57,7 @@ contract GiveawayV1 is ReentrancyGuard, Ownable, AccessControl {
     event FundsAdded(bytes32 indexed id, uint256 amount);
     event GiveawayCanceled(bytes32 indexed id);
     event ResultCommitted(bytes32 indexed id, bytes32 resultHash);
-    event WinnersFinalized(bytes32 indexed id);
+    event WinnersFinalized(bytes32 indexed id, address[] winners, uint256[] amounts);
     event VerifierUpdated(address verifier, bool allowed);
     event PayoutWalletUpdated(address indexed user, address wallet);
     event HostProfileUpdated(address indexed host, string metadataURI);
@@ -198,7 +198,7 @@ contract GiveawayV1 is ReentrancyGuard, Ownable, AccessControl {
         require(total <= g.prize, "Exceeds prize");
         g.status = Status.Finalized;
 
-        emit WinnersFinalized(id);
+        emit WinnersFinalized(id, winners, amounts);
     }
 
     function updateHostProfile(string calldata metadataURI) external {

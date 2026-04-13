@@ -73,11 +73,11 @@ export interface IGame {
   currentGame: string
   nextGame: string
   cooldownEndsAt: string | null
-  winners: any[]
+  winners: `0x${string}`[]
   resultHash: string | null
   createdAt: string
   updatedAt: string
-  players: IPlayer[]
+  players: IGamePlayer[]
 }
 
 export enum PlayerStatus {
@@ -85,11 +85,11 @@ export enum PlayerStatus {
   Offline = "offline",
 }
 
-export interface IPlayer {
+export interface IGamePlayer {
   id: string
   playerId: string
   gameId: string
-  status: "online"
+  status: PlayerStatus
   eliminated: boolean
   placement: number | null
   prize: string | null
@@ -100,4 +100,12 @@ export interface IPlayer {
     displayName: string
     createdAt: string
   }
+}
+
+export interface IPlayer {
+    id: string,
+    walletAddress: `0x${string}`,
+    displayName: string,
+    createdAt: string,
+    games: IGame[]
 }

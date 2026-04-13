@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useWalletBalances } from "@/hooks/use-wallet-balances"
+import { IPlayer } from "@/lib/models"
 import { serverUrl } from "@/lib/utils"
 import { baseChain } from "@/lib/wallet/wagmi"
 import { fetchPlayerByWallet } from "@/service/player.service"
@@ -25,16 +26,14 @@ export const UserWalletHeader = () => {
   const { data: balanceData } = useBalance({
     address,
   })
-  const { data: player, isLoading } = useQuery({
+  const { data: player, isLoading } = useQuery<IPlayer>({
     queryKey: ["player-info", address],
     queryFn: async () => fetch(`${serverUrl}/api/players/${address?.toLowerCase()}`).then((res) => res.json()),
     enabled: !!address,
   })
 
   console.log({ balanceData, player, address })
-  // const {} = useMemo(() => {
-  //   const totalEarned = player.
-  // }, [player])
+  
   return (
     <Fragment>
       <Card className="relative overflow-hidden border-none bg-primary text-primary-foreground">
@@ -74,7 +73,7 @@ export const UserWalletHeader = () => {
           <p className="text-[10px] font-bold text-muted-foreground uppercase">
             Games Played
           </p>
-          <p className="text-xl font-black">24</p>
+          <p className="text-xl font-black">{player?.games.length || 0}</p>
         </Card>
       </div>
     </Fragment>
